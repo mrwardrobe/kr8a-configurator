@@ -1,4 +1,6 @@
 import type { MetadataRoute } from 'next';
+import { publicSiteUrl } from '../lib/site';
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: 'https://www.kr8a.com/', changeFrequency: 'monthly', priority: 1 }];
+  const siteUrl = publicSiteUrl();
+  return siteUrl ? [{ url: `${siteUrl}/`, changeFrequency: 'monthly', priority: 1 }] : [];
 }

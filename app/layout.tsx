@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
+import { publicSiteUrl } from '../lib/site';
 import './globals.css';
 
+const siteUrl = publicSiteUrl();
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.kr8a.com'),
+  ...(siteUrl ? { metadataBase: new URL(siteUrl), alternates: { canonical: `${siteUrl}/` } } : {}),
   title: 'KR8A | Sideboards made for your space',
   description: 'Design a made-to-measure sideboard around your room. Set its dimensions, fronts, interior and finish in the KR8A configurator.',
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website', title: 'KR8A | Sideboards made for your space',
     description: 'Design a sideboard around your room.',
-    url: 'https://www.kr8a.com/', images: [{ url: '/images/kr8a-hero-provisional.jpg', width: 1024, height: 1536, alt: 'KR8A sideboard design in an interior' }],
+    ...(siteUrl ? { url: `${siteUrl}/` } : {}),
   },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

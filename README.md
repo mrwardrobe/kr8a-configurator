@@ -11,6 +11,8 @@ npm run dev
 
 Open `http://localhost:3000`. Run `npm run typecheck`, `npm run test`, and `npm run build` before merging changes. The prototype was developed and tested with Node 22.
 
+The owner confirmed `kr8a.com` as the public domain. Canonical URLs and the sitemap default to `https://kr8a.com`; set `NEXT_PUBLIC_SITE_URL` only if the deployed canonical origin differs.
+
 ## What is implemented
 
 - An editorial homepage based on the supplied Claude Design homepage export, with responsive layouts, a wall-fit journey, starting designs, materials preview and FAQ.
