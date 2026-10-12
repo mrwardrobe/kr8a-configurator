@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound() { return <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24 }}><div><Link href="/" className="brand">KR8A</Link><p className="eyebrow" style={{ marginTop: 60 }}>Page not found</p><h1 style={{ fontSize: 'clamp(48px,8vw,100px)', lineHeight: 1, margin: '15px 0 30px' }}>Let’s begin again.</h1><Link href="/" className="button button-ink">Back to KR8A ↗</Link></div></main>; }

@@ -1,228 +1,51 @@
 'use client';
 
-import { SideboardConfig, WOODS, MATTES, FINISH_MAP } from '../lib/sideboardEngine';
+import { useState } from 'react';
+import { BASES, FINISHES, HANDLES, LIMITS, Front, Inside, SideboardConfig, bayOptions, bayWidth, frontName, insideName, normalizeConfig } from '../lib/sideboardEngine';
 
-type Props = {
-  config: SideboardConfig;
-  onChange: (config: SideboardConfig) => void;
-};
+export type Chapter = 'size' | 'fronts' | 'inside' | 'finish' | 'base' | 'handles';
+type Props = { config: SideboardConfig; onChange: (config: SideboardConfig) => void; chapter: Chapter; selectedBay: number; onSelectedBay: (index: number) => void };
 
-function DimensionSlider({
-  label,
-  value,
-  min,
-  max,
-  unit,
-  onValue,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  unit: string;
-  onValue: (v: number) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-3 group">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-400">{label}</span>
-        <span className="text-sm tabular-nums font-medium text-neutral-900">
-          {value}{unit}
-        </span>
-      </div>
-      <div className="relative flex items-center h-4">
-        <div className="absolute w-full h-[2px] bg-neutral-200 rounded-full" />
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value}
-          onChange={(e) => onValue(Number(e.target.value))}
-          className="relative w-full h-4 bg-transparent appearance-none cursor-pointer accent-neutral-900 z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-neutral-900 [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
-        />
-      </div>
-    </div>
-  );
+function SectionLabel({ number, children }: { number: string; children: React.ReactNode }) {
+  return <div className="panel-section-label"><span>{number}</span>{children}</div>;
+}
+function Dimension({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step: number; onChange: (value: number) => void }) {
+  return <label className="dimension-control"><span><strong>{label}</strong><span>{value} <small>mm</small></span></span><input type="range" min={min} max={max} step={step} value={value} onChange={event => onChange(Number(event.target.value))} aria-label={`${label} in millimetres`} /><span className="range-endpoints"><small>{min} mm</small><small>{max} mm</small></span></label>;
 }
 
-function FinishSwatchPicker({
-  label,
-  value,
-  options,
-  onValue,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onValue: (v: string) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-4">
-      <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-400">{label}</span>
-      <div className="grid grid-cols-3 gap-x-3 gap-y-4">
-        {options.map((opt) => {
-          const isSelected = value === opt;
-          const bg = FINISH_MAP[opt]?.color || '#ffffff';
-          const isWood = WOODS.includes(opt);
-
-          const woodGrainPattern = `
-            linear-gradient(90deg, 
-              rgba(0,0,0,0.02) 0%, 
-              rgba(0,0,0,0) 15%, 
-              rgba(0,0,0,0.08) 30%, 
-              rgba(0,0,0,0) 50%, 
-              rgba(0,0,0,0.04) 75%, 
-              rgba(0,0,0,0) 90%, 
-              rgba(0,0,0,0.1) 100%
-            ),
-            repeating-linear-gradient(
-              to right,
-              transparent,
-              transparent 1px,
-              rgba(0,0,0,0.04) 1px,
-              rgba(0,0,0,0.04) 3px
-            )
-          `;
-
-          const inlineStyle = isWood
-            ? { backgroundColor: bg, backgroundImage: woodGrainPattern }
-            : { backgroundColor: bg };
-
-          return (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => onValue(opt)}
-              className="flex flex-col items-center gap-2 group outline-none"
-            >
-              <div
-                className={`w-full aspect-square rounded-md shadow-sm border transition-all duration-300 cursor-pointer ${
-                  isSelected ? 'border-neutral-900 ring-2 ring-neutral-900/10 scale-[1.05]' : 'border-neutral-200 group-hover:border-neutral-400'
-                }`}
-                style={inlineStyle}
-              />
-              <span className={`text-[9px] leading-tight text-center tracking-tight transition-colors duration-200 ${
-                isSelected ? 'text-neutral-900 font-semibold' : 'text-neutral-500'
-              }`}>
-                {opt.split(' ').slice(0, 2).join(' ')}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-export default function ConfiguratorPanel({ config, onChange }: Props) {
-  const update = <K extends keyof SideboardConfig>(key: K, value: SideboardConfig[K]) => {
-    onChange({ ...config, [key]: value });
+export default function ConfiguratorPanel({ config, onChange, chapter, selectedBay, onSelectedBay }: Props) {
+  const [wall, setWall] = useState('');
+  const [fitMessage, setFitMessage] = useState('');
+  const [clearance, setClearance] = useState(50);
+  const set = (patch: Partial<SideboardConfig>) => onChange(normalizeConfig({ ...config, ...patch }));
+  const setArray = <K extends 'fronts' | 'inside' | 'shelves'>(key: K, index: number, value: SideboardConfig[K][number]) => {
+    const next = [...config[key]]; (next[index] as SideboardConfig[K][number]) = value; set({ [key]: next });
   };
+  const fitWall = () => {
+    const width = Number(wall);
+    if (!Number.isFinite(width) || width < LIMITS.width.min + clearance * 2) { setFitMessage('This wall is below the current prototype width. Please review the size with KR8A.'); return; }
+    const proposed = Math.floor((width - 2 * clearance) / 10) * 10;
+    const fitted = Math.min(LIMITS.width.max, proposed);
+    set({ width: fitted });
+    setFitMessage(`${fitted} mm design · ${Math.round((width - fitted) / 2)} mm free on each side.`);
+  };
+  const available = bayOptions(config.width);
+  const selected = Math.min(selectedBay, config.fronts.length - 1);
+  return <div className="config-panel-content">
+    {chapter === 'size' && <div className="panel-layout size-layout">
+      <div><SectionLabel number="01 /">Set your dimensions</SectionLabel><h2>Made to fit.</h2><p>Adjust the three dimensions in 10 mm increments. The 3D view responds as you design.</p></div>
+      <div className="dimension-stack"><Dimension label="Width" value={config.width} {...LIMITS.width} onChange={width => set({ width })} /><Dimension label="Height" value={config.height} {...LIMITS.height} onChange={height => set({ height })} /><Dimension label="Depth" value={config.depth} {...LIMITS.depth} onChange={depth => set({ depth })} /></div>
+      <div className="wall-fit-mini"><SectionLabel number="/">Fit to your wall</SectionLabel><label className="mini-input"><span>Wall or alcove width</span><span><input value={wall} inputMode="numeric" onChange={event => setWall(event.target.value.replace(/[^0-9]/g, '').slice(0, 5))} aria-label="Wall width in millimetres" placeholder="e.g. 2380" /> mm</span></label><div className="mini-choices">{[20, 50, 100].map(value => <button key={value} type="button" aria-pressed={clearance === value} onClick={() => setClearance(value)}>{value} mm</button>)}</div><button className="text-link" type="button" onClick={fitWall}>Draw to fit →</button><p className="fit-status" role="status">{fitMessage || 'Choose breathing room on each side.'}</p></div>
+    </div>}
 
-  return (
-    <aside className="w-[340px] h-full bg-[#fcfaf7] border-r border-neutral-200/60 p-10 flex flex-col gap-10 shadow-[20px_0_40px_rgba(0,0,0,0.01)] z-10 selection:bg-neutral-900 selection:text-white">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-light text-neutral-900 tracking-[-0.02em] font-serif">
-          KR8A <span className="text-neutral-300 font-sans text-lg ml-1">Series</span>
-        </h1>
-        <p className="text-[13px] text-neutral-400 leading-relaxed font-medium">
-          Modular Sideboard System v1.0
-        </p>
-      </header>
+    {chapter === 'fronts' && <div className="panel-layout"><div><SectionLabel number="02 /">Arrange the fronts</SectionLabel><h2>Find your rhythm.</h2><p>Bay widths respond to the overall width. Choose doors, drawer stacks or open spaces.</p></div><div className="panel-main"><div className="option-title">Number of bays <small>{Math.round(bayWidth(config.width, config.fronts.length))} mm per bay</small></div><div className="choice-row">{[2, 3, 4].map(count => <button key={count} className="option-card" aria-pressed={config.fronts.length === count} disabled={!available.includes(count)} title={!available.includes(count) ? 'Outside the current bay width range at this size' : undefined} onClick={() => set({ fronts: Array(count).fill('D'), inside: Array(count).fill('S'), shelves: Array(count).fill(1) })}><span className="bay-symbol">{Array.from({ length: count }, (_, index) => <i key={index} />)}</span><strong>{count} bays</strong></button>)}</div><div className="option-title front-title">Front for each bay</div><div className="front-bay-grid">{config.fronts.map((front, index) => <div key={index} className="front-bay-control"><span>Bay {index + 1}</span><select value={front} aria-label={`Front for bay ${index + 1}`} onChange={event => setArray('fronts', index, event.target.value as Front)}><option value="D">Door</option><option value="R" disabled={config.height < 650}>Three drawers</option><option value="O">Open</option></select></div>)}</div><small className="panel-note">Drawer fronts require a minimum overall height of 650 mm in this design preview.</small></div></div>}
 
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2 flex flex-col gap-12 scrollbar-hide">
-        {/* Dimensions Section */}
-        <section className="space-y-8">
-          <DimensionSlider
-            label="Width"
-            value={config.width}
-            min={60}
-            max={240}
-            unit="cm"
-            onValue={(v) => update('width', v)}
-          />
-          <DimensionSlider
-            label="Height"
-            value={config.height}
-            min={30}
-            max={120}
-            unit="cm"
-            onValue={(v) => update('height', v)}
-          />
-          <DimensionSlider
-            label="Depth"
-            value={config.depth}
-            min={20}
-            max={60}
-            unit="cm"
-            onValue={(v) => update('depth', v)}
-          />
-        </section>
+    {chapter === 'inside' && <div className="panel-layout"><div><SectionLabel number="03 /">Consider the inside</SectionLabel><h2>Room for more.</h2><p>Choose a bay, then shape the storage behind its front.</p></div><div className="panel-main"><div className="option-title">Choose a bay</div><div className="bay-tabs">{config.fronts.map((front, index) => <button key={index} type="button" aria-pressed={selected === index} onClick={() => onSelectedBay(index)}><span>0{index + 1}</span><strong>{frontName(front)}</strong></button>)}</div>{config.fronts[selected] === 'R' ? <p className="panel-note">This bay has three drawers. Change its front to select another internal layout.</p> : <><div className="option-title front-title">Fit out bay {selected + 1}</div><div className="inside-options">{([['S', 'Adjustable shelves', 'Move with your collection'], ['I', 'Inner drawers', 'Extra organisation behind a door'], ['V', 'Record dividers', 'Keep records upright']] as const).map(([id, title, note]) => <button type="button" key={id} aria-pressed={config.inside[selected] === id} disabled={id === 'I' && (config.height < 690 || config.fronts[selected] !== 'D')} onClick={() => setArray('inside', selected, id as Inside)}><span className="radio-dot" /><span><strong>{title}</strong><small>{note}</small></span></button>)}</div>{config.inside[selected] !== 'V' && <div className="shelf-stepper"><span>{config.inside[selected] === 'I' ? 'Additional shelf' : 'Number of shelves'}</span><div><button type="button" aria-label="Fewer shelves" onClick={() => setArray('shelves', selected, Math.max(0, config.shelves[selected] - 1))}>−</button><strong>{config.shelves[selected]}</strong><button type="button" aria-label="More shelves" onClick={() => setArray('shelves', selected, Math.min(config.inside[selected] === 'I' ? 1 : 3, config.shelves[selected] + 1))}>+</button></div></div>}</>}</div></div>}
 
-        {/* Layout Section */}
-        <section className="space-y-6">
-          <DimensionSlider
-            label="Internal Bays"
-            value={config.dividerCount}
-            min={1}
-            max={4}
-            unit=""
-            onValue={(v) => update('dividerCount', v)}
-          />
+    {chapter === 'finish' && <div className="panel-layout"><div><SectionLabel number="04 /">Choose a finish</SectionLabel><h2>Material matters.</h2><p>Move between warm grain and quiet colour. Production finishes and samples are still being confirmed.</p></div><div className="panel-main"><div className="option-title">Exterior</div><div className="finish-choices">{FINISHES.map(item => <button key={item.id} type="button" aria-pressed={config.finish === item.id} onClick={() => set({ finish: item.id })}><span className={`finish-chip ${item.grain ? 'grain-surface' : ''}`} style={{ backgroundColor: item.color }} /><strong>{item.name}</strong><small>{item.family}</small></button>)}</div><div className="option-title front-title">Interior</div><div className="interior-choices"><button type="button" aria-pressed={config.interior === 'match'} onClick={() => set({ interior: 'match' })}>Match exterior</button>{FINISHES.map(item => <button key={item.id} type="button" aria-pressed={config.interior === item.id} onClick={() => set({ interior: item.id })}>{item.name}</button>)}</div></div></div>}
 
-          <div className="flex flex-col gap-4 pt-2">
-            <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-400">Finish Logic</span>
-            <div className="flex p-1 bg-neutral-200/50 rounded-lg">
-              {(['Pure', 'Contrast'] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => update('style', s)}
-                  className={`flex-1 py-2 text-xs font-semibold rounded-md transition-all ${
-                    config.style === s 
-                      ? 'bg-white text-neutral-900 shadow-sm' 
-                      : 'text-neutral-400 hover:text-neutral-600'
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+    {chapter === 'base' && <div className="panel-layout"><div><SectionLabel number="05 /">Set the stance</SectionLabel><h2>How it meets the room.</h2><p>A subtle change of base gives the whole piece a different posture.</p></div><div className="panel-main"><div className="choice-row base-choices">{BASES.map(item => <button key={item.id} type="button" className="option-card" aria-pressed={config.base === item.id} onClick={() => set({ base: item.id })}><span className={`base-symbol base-symbol-${item.id}`} /><strong>{item.name}</strong><small>{item.note}</small></button>)}</div><p className="panel-note">Floating installation needs a wall and fixing review before manufacture.</p></div></div>}
 
-        {/* Material Section */}
-        <section className="space-y-8 pb-4">
-          {config.style === 'Pure' ? (
-            <FinishSwatchPicker
-              label="Overall Material"
-              value={config.shellFinish}
-              options={[...WOODS, ...MATTES]}
-              onValue={(v) => onChange({ ...config, shellFinish: v, frontFinish: v })}
-            />
-          ) : (
-            <>
-              <FinishSwatchPicker
-                label="Exterior Shell"
-                value={config.shellFinish}
-                options={WOODS}
-                onValue={(v) => update('shellFinish', v)}
-              />
-              <FinishSwatchPicker
-                label="Interior & Doors"
-                value={config.frontFinish}
-                options={MATTES}
-                onValue={(v) => update('frontFinish', v)}
-              />
-            </>
-          )}
-        </section>
-      </div>
-
-      <footer className="pt-6 border-t border-neutral-200/60">
-        <button className="w-full py-5 px-6 bg-neutral-900 text-white text-[13px] font-bold rounded-2xl hover:bg-black transition-all active:scale-[0.98] shadow-xl shadow-neutral-900/10">
-          Request Quote
-        </button>
-      </footer>
-    </aside>
-  );
+    {chapter === 'handles' && <div className="panel-layout"><div><SectionLabel number="06 /">The finishing touch</SectionLabel><h2>Open beautifully.</h2><p>Choose the gesture you want to use every day.</p></div><div className="panel-main"><div className="choice-row handle-choices">{HANDLES.map(item => <button key={item.id} type="button" className="option-card" aria-pressed={config.handle === item.id} onClick={() => set({ handle: item.id })}><span className={`handle-symbol handle-symbol-${item.id}`} /><strong>{item.name}</strong><small>{item.note}</small></button>)}</div><p className="panel-note">Hardware specification is subject to final construction review.</p></div></div>}
+  </div>;
 }

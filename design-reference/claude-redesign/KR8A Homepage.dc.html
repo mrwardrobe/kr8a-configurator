@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Libre+Caslon+Display&amp;display=swap">
+<script src="./kr8a-engine.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+html,body{margin:0;background:#ECE7DF;color:#1B1916;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+a{color:#1B1916}a:hover{color:#6A6259}
+button{font:inherit;color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:1.5px solid currentColor;outline-offset:4px}
+summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:none}
+details[open] .plus{transform:rotate(45deg)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</helmet>
+<div style="font-family:Geist,sans-serif;color:#1B1916;background:#ECE7DF">
+
+<header style="position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(20px,4vw,48px)">
+  <a href="#top" style="font-weight:600;font-size:15px;letter-spacing:.34em;text-decoration:none;color:#F4F0EA">KR8A</a>
+  <nav aria-label="Primary" style="display:flex;align-items:center;gap:clamp(14px,3vw,34px)">
+    <a href="#wall" style="font-size:13px;text-decoration:none;color:#F4F0EA">Fit to your wall</a>
+    <a href="#range" style="font-size:13px;text-decoration:none;color:#F4F0EA">Sideboards</a>
+    <a href="#materials" style="font-size:13px;text-decoration:none;color:#F4F0EA">Materials</a>
+    <a href="KR8A Configurator.dc.html" style="background:#F4F0EA;color:#1B1916;padding:12px 20px;font-size:13px;font-weight:500;text-decoration:none">Design yours</a>
+  </nav>
+</header>
+
+<main id="top">
+<section aria-label="Introduction" style="background:#2B3A31;color:#F4F0EA;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));min-height:100vh">
+  <div style="display:flex;flex-direction:column;justify-content:flex-end;padding:140px clamp(20px,4vw,48px) clamp(40px,5vw,72px)">
+    <h1 style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(52px,7vw,112px);line-height:.96;letter-spacing:-.025em">Made for<br>your wall.</h1>
+    <p style="margin:32px 0 0;max-width:400px;font-size:clamp(17px,1.4vw,20px);line-height:1.5;color:#D6D9D1;text-wrap:pretty">Oak and walnut sideboards, built to the millimetre and designed by you.</p>
+    <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin-top:40px">
+      <a href="KR8A Configurator.dc.html" style="background:#F4F0EA;color:#1B1916;padding:20px 34px;font-size:14px;font-weight:500;text-decoration:none">Design yours</a>
+      <a href="#wall" style="font-size:14px;color:#F4F0EA;text-underline-offset:5px">Fit one to your wall</a>
+    </div>
+    <p style="margin:36px 0 0;font-size:13px;color:#B9C0B5">From {{ heroPrice }} · illustrative price</p>
+  </div>
+  <figure style="margin:0;position:relative;min-height:62vh;background:#2B3A31"><img src="assets/kr8a-hero.png" alt="Natural oak sideboard with two doors and a pair of drawers against a green panelled wall, with a table lamp and an orchid on top" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block"></figure>
+</section>
+
+<section id="wall" aria-labelledby="wall-h" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));min-height:92vh">
+  <div style="display:flex;flex-direction:column;justify-content:center;padding:clamp(56px,8vw,120px) clamp(20px,4vw,56px)">
+    <h2 id="wall-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(38px,4.6vw,72px);line-height:1.02;letter-spacing:-.02em">How wide is your wall?</h2>
+    <p style="margin:22px 0 0;max-width:400px;font-size:16px;line-height:1.6;color:#3D3832;text-wrap:pretty">Enter the width of the wall or alcove. The sideboard is drawn to fit, with the breathing room you choose.</p>
+    <label style="display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #1B1916;padding:8px 0;margin-top:40px;max-width:300px">
+      <input inputmode="numeric" value="{{ wall }}" onChange="{{ onWall }}" aria-label="Wall width in millimetres" style="border:0;background:transparent;font-family:'Libre Caslon Display',serif;font-size:56px;width:170px;color:#1B1916;padding:0">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#6A6259">mm</span>
+    </label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:22px">
+      <sc-for list="{{ opts }}" as="o" hint-placeholder-count="3">
+        <button onClick="{{ o.go }}" aria-pressed="{{ o.on }}" style="position:relative;background:transparent;border:0;padding:12px 16px;cursor:pointer;text-align:left;min-height:48px">
+          <sc-if value="{{ o.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+          <span style="display:block;font-size:14px;font-weight:500">{{ o.label }}</span><span style="display:block;font-size:12px;color:#6A6259;margin-top:2px">{{ o.sub }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <p style="margin:32px 0 0;font-family:'Libre Caslon Display',serif;font-size:clamp(24px,2.4vw,34px);line-height:1.15;font-variant-numeric:tabular-nums">{{ result }}</p>
+    <a href="{{ wallHref }}" style="align-self:flex-start;margin-top:28px;background:#1B1916;color:#F4F0EA;padding:18px 30px;font-size:14px;font-weight:500;text-decoration:none">Continue with this width</a>
+  </div>
+  <div style="position:relative;min-height:62vh;background:#E8E0D2">
+    <x-import component-from-global-scope="kr8a-viewer" from="./kr8a-viewer.js" config="{{ wallCfg }}" wall="{{ wallMm }}" dims="true" view="34" idle="true" hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+  </div>
+</section>
+
+<section id="range" aria-labelledby="range-h" style="padding:clamp(80px,11vw,160px) clamp(20px,4vw,48px)">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:48px">
+    <h2 id="range-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(34px,4.2vw,60px);letter-spacing:-.015em">Start from one of these</h2>
+    <p style="margin:0;font-size:14px;color:#6A6259;max-width:340px;text-wrap:pretty">Each opens in the configurator, ready to change. Sizes and prices are illustrative.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(20px,2.4vw,40px)">
+    <sc-for list="{{ starts }}" as="p" hint-placeholder-count="3">
+      <a href="{{ p.href }}" style="display:block;text-decoration:none;color:#1B1916">
+        <div style="position:relative;aspect-ratio:4/3;background:#E8E0D2"><x-import component-from-global-scope="kr8a-viewer" from="./kr8a-viewer.js" config="{{ p.cfg }}" view="34" idle="false" hint-size="100%,100%" style="position:absolute;inset:0"></x-import></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-top:20px">
+          <div><div style="font-family:'Libre Caslon Display',serif;font-size:28px;letter-spacing:-.01em">{{ p.name }}</div><div style="font-size:13px;color:#6A6259;margin-top:6px">{{ p.spec }}</div></div>
+          <div style="text-align:right;white-space:nowrap"><div style="font-size:17px;font-variant-numeric:tabular-nums">{{ p.price }}</div><div style="font-size:11px;color:#6A6259;margin-top:4px">Illustrative</div></div>
+        </div>
+      </a>
+    </sc-for>
+  </div>
+</section>
+
+<section aria-labelledby="inside-h" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));background:#F6F3EE;align-items:stretch">
+  <div style="position:relative;min-height:70vh;background:#E8E0D2"><x-import component-from-global-scope="kr8a-viewer" from="./kr8a-viewer.js" config="{{ openCfg }}" opened="all" view="34" idle="false" hint-size="100%,100%" style="position:absolute;inset:0"></x-import></div>
+  <div style="display:flex;flex-direction:column;justify-content:center;padding:clamp(56px,8vw,120px) clamp(20px,4vw,56px)">
+    <h2 id="inside-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(34px,4.2vw,60px);line-height:1.04;letter-spacing:-.015em;text-wrap:balance">Open the doors. Every bay is yours to fit out.</h2>
+    <dl style="margin:40px 0 0">
+      <sc-for list="{{ facts }}" as="r" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;padding:16px 0;border-top:1px solid rgba(27,25,22,.14)">
+          <dt style="font-size:13px;color:#6A6259;padding-top:2px">{{ r.k }}</dt>
+          <dd style="margin:0;font-size:15px;line-height:1.5">{{ r.v }}</dd>
+        </div>
+      </sc-for>
+    </dl>
+    <a href="KR8A Configurator.dc.html" style="align-self:flex-start;margin-top:32px;font-size:14px;text-underline-offset:5px">Open the configurator →</a>
+  </div>
+</section>
+
+<section id="materials" aria-labelledby="mat-h" style="padding:clamp(80px,11vw,160px) clamp(20px,4vw,48px)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(32px,5vw,80px);margin-bottom:56px">
+    <h2 id="mat-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(34px,4.2vw,60px);letter-spacing:-.015em">Materials</h2>
+    <div style="max-width:520px"><p style="margin:0;font-size:16px;line-height:1.6;color:#3D3832;text-wrap:pretty">KR8A furniture is made from honest materials, chosen for how they age and how they feel. The simplicity of flat-pack delivery does not diminish the quality of what arrives.</p><p style="margin:16px 0 0;font-size:16px;line-height:1.6;color:#3D3832">What comes in a box becomes something permanent.</p><p style="margin:24px 0 0;font-size:12px;color:#6A6259">Finishes shown are design explorations. Production finishes and samples to be confirmed.</p></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:clamp(12px,2vw,28px)">
+    <sc-for list="{{ finishes }}" as="f" hint-placeholder-count="6">
+      <div>
+        <div style="{{ f.st }}"></div>
+        <div style="font-family:'Libre Caslon Display',serif;font-size:22px;margin-top:16px">{{ f.name }}</div>
+        <div style="font-size:13px;line-height:1.45;color:#6A6259;margin-top:6px;text-wrap:pretty">{{ f.blurb }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section aria-labelledby="det-h" style="padding:0 clamp(20px,4vw,48px) clamp(80px,11vw,160px)">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:28px">
+    <h2 id="det-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(28px,3.2vw,44px);letter-spacing:-.01em">In detail</h2>
+    <span style="font-size:12px;color:#6A6259">Crops from a reference photograph. To be replaced with KR8A photography.</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:clamp(8px,1vw,16px)">
+    <figure style="margin:0"><div style="aspect-ratio:4/5;position:relative"><image-slot id="d-grain" shape="rect" src="assets/crop-grain.png" placeholder="Grain, close"></image-slot></div><figcaption style="font-size:13px;color:#6A6259;margin-top:10px">Grain and door edge, in daylight</figcaption></figure>
+    <figure style="margin:0"><div style="aspect-ratio:4/5;position:relative"><image-slot id="d-top" shape="rect" src="assets/crop-top.png" placeholder="Styled top"></image-slot></div><figcaption style="font-size:13px;color:#6A6259;margin-top:10px">Styled the way it is lived with</figcaption></figure>
+    <figure style="margin:0"><div style="aspect-ratio:4/5;position:relative"><image-slot id="d-base" shape="rect" src="assets/crop-base.png" placeholder="Base, low angle"></image-slot></div><figcaption style="font-size:13px;color:#6A6259;margin-top:10px">Low angle, where the base meets the floor</figcaption></figure>
+    <figure style="margin:0"><div style="aspect-ratio:4/5;position:relative"><image-slot id="d-handle" shape="rect" placeholder="Handle detail"></image-slot></div><figcaption style="font-size:13px;color:#6A6259;margin-top:10px">The handle, up close</figcaption></figure>
+  </div>
+</section>
+
+<section aria-labelledby="trust-h" style="background:#F6F3EE;padding:clamp(72px,10vw,140px) clamp(20px,4vw,48px)">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap;margin-bottom:40px">
+    <h2 id="trust-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(32px,4vw,56px);letter-spacing:-.01em">Made, delivered, guaranteed</h2>
+    <span style="font-size:12px;color:#6A6259">Content to be supplied by KR8A</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:clamp(16px,2vw,32px)">
+    <sc-for list="{{ trust }}" as="t" hint-placeholder-count="5">
+      <div style="border-top:1px solid #1B1916;padding:20px 0 0;min-height:120px">
+        <div style="font-size:16px;font-weight:500">{{ t.t }}</div>
+        <div style="font-size:13px;line-height:1.55;color:#6A6259;margin-top:10px;text-wrap:pretty">{{ t.d }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section id="approach" aria-labelledby="app-h" style="padding:clamp(88px,13vw,200px) clamp(20px,4vw,48px)">
+  <div style="font-size:13px;color:#6A6259;margin-bottom:32px">The approach</div>
+  <h2 id="app-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(34px,5vw,76px);line-height:1.05;letter-spacing:-.02em">Bespoke without friction.<br>Flat-pack without compromise.<br>Digital design. Physical permanence.</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:clamp(24px,4vw,64px);margin-top:clamp(48px,7vw,100px)">
+    <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="3">
+      <div style="border-top:1px solid #1B1916;padding-top:20px">
+        <div style="font-size:17px;font-weight:500">{{ p.t }}</div>
+        <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:#3D3832;max-width:300px;text-wrap:pretty">{{ p.d }}</p>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section aria-labelledby="faq-h" style="padding:0 clamp(20px,4vw,48px) clamp(80px,11vw,160px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(32px,6vw,96px)">
+  <h2 id="faq-h" style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(32px,4vw,56px);letter-spacing:-.01em">Questions</h2>
+  <div style="max-width:760px">
+    <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="5">
+      <details style="border-top:1px solid rgba(27,25,22,.2)">
+        <summary style="display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;font-size:17px"><span>{{ q.q }}</span><span class="plus" style="font-size:22px;line-height:1;transition:transform .25s">+</span></summary>
+        <p style="margin:0 0 24px;max-width:600px;font-size:15px;line-height:1.6;color:#3D3832;text-wrap:pretty">{{ q.a }}</p>
+      </details>
+    </sc-for>
+    <div style="border-top:1px solid rgba(27,25,22,.2)"></div>
+  </div>
+</section>
+
+<section id="early" aria-labelledby="early-h" style="background:#2B3A31;color:#F4F0EA;padding:clamp(88px,13vw,200px) clamp(20px,4vw,48px)">
+  <div style="font-size:13px;color:#B9C0B5;margin-bottom:24px">Early access</div>
+  <h2 id="early-h" style="margin:0;max-width:900px;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(40px,6vw,88px);line-height:1.02;letter-spacing:-.02em">Launching in stages.</h2>
+  <p style="margin:28px 0 0;max-width:520px;font-size:18px;line-height:1.55;color:#D6D9D1;text-wrap:pretty">Early access to the design platform will open soon. Be among the first to design furniture that fits your space exactly.</p>
+  <div style="margin-top:44px;max-width:620px">
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <label style="flex:1 1 240px"><span style="position:absolute;left:-9999px">Email address</span><input type="email" value="{{ email }}" onInput="{{ onEmail }}" placeholder="Enter your email" style="width:100%;box-sizing:border-box;height:56px;border:1px solid rgba(244,240,234,.6);background:transparent;padding:0 18px;font-size:16px;color:#F4F0EA;font-family:inherit"></label>
+      <button onClick="{{ onSend }}" style="height:56px;padding:0 28px;background:#F4F0EA;color:#1B1916;border:0;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Request early access</button>
+    </div>
+    <p style="margin:14px 0 0;font-size:13px;color:#B9C0B5">{{ earlyMsg }}</p>
+  </div>
+</section>
+</main>
+
+<footer style="padding:56px clamp(20px,4vw,48px) 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:32px;font-size:13px">
+  <div><div style="font-weight:600;font-size:15px;letter-spacing:.34em">KR8A</div><p style="margin:16px 0 0;color:#6A6259;max-width:240px;line-height:1.55">A web-based furniture design platform.<br>Made-to-measure sideboards.</p></div>
+  <nav aria-label="Footer" style="display:flex;flex-direction:column;gap:10px"><a href="KR8A Configurator.dc.html">Design yours</a><a href="#wall">Fit to your wall</a><a href="#range">Sideboards</a><a href="#materials">Materials</a></nav>
+  <div style="color:#6A6259;line-height:1.7">Contact, delivery, returns and company details<br>to be supplied by KR8A.</div>
+  <div style="color:#6A6259">© KR8A</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { k: 0, wall: '2380', gap: 100, email: '', sent: false };
+  componentDidMount() { const go = () => window.KR8A ? this.setState({ k: 1 }) : (this._t = setTimeout(go, 40)); go(); }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const s = this.state;
+    const pillars = [
+      { t: 'Designed for fit', d: 'Every dimension is set by the room it will live in.' },
+      { t: 'Proportion first', d: 'Door and drawer sizes adjust with the width, so proportions hold.' },
+      { t: 'Made to stay', d: 'Construction and materials detail to be supplied by KR8A.' }
+    ];
+    const facts = [
+      { k: 'Fronts', v: 'Doors, three-drawer stacks or open bays, across two, three or four bays.' },
+      { k: 'Inside', v: 'Adjustable shelves, inner drawers behind the door, or upright dividers for records.' },
+      { k: 'Hardware', v: 'Soft-close hinges and full-extension runners. Specification to be confirmed.' },
+      { k: 'Base', v: 'Slim metal legs, timber legs, a recessed plinth or a floating base.' }
+    ];
+    const trust = [
+      { t: 'How it is made', d: 'Construction, joinery and workshop details.' },
+      { t: 'Materials and samples', d: 'Where the timber comes from, and how to request a sample.' },
+      { t: 'Delivery and assembly', d: 'Arrives flat and goes together at home. Lead times and areas to be confirmed.' },
+      { t: 'Guarantee and returns', d: 'Warranty length and returns policy.' },
+      { t: 'Real homes', d: 'Customer photographs and reviews, once there are some.' }
+    ];
+    const faqs = [
+      { q: 'Can I really choose the exact size?', a: 'Yes. Width, height and depth are set with sliders. Final limits are being confirmed, so the ranges shown are illustrative.' },
+      { q: 'Is the price on the configurator final?', a: 'Not yet. Prices are illustrative while pricing is finalised. We confirm the specification and price before anything is made.' },
+      { q: 'Can I see a sample?', a: 'Sample availability is to be confirmed.' },
+      { q: 'How long does it take to arrive?', a: 'Lead times are to be confirmed and will be shown before you order.' },
+      { q: 'What happens when I send my design?', a: 'The complete configuration comes to us as a single link, so we know exactly what you designed.' }
+    ];
+    const em = { email: s.email, onEmail: e => this.setState({ email: e.target.value, sent: false }), earlyMsg: s.sent ? 'Thank you. This prototype does not store addresses.' : 'Low volume. No spam. No noise.', onSend: () => { if (/.+@.+\..+/.test(s.email)) this.setState({ sent: true }); } };
+    const base = { ...em, pillars, facts, trust, faqs, wall: s.wall };
+    if (!s.k) return { ...base, heroPrice: '', result: '', wallHref: '#', wallCfg: '', wallMm: 0, opts: [], starts: [], finishes: [], openCfg: '' };
+    const K = KR8A, L = K.LIMITS.width;
+    const validate = o => K.validate(Object.assign({}, o, { fronts: o.fronts.split('') })).config;
+    const wl = +s.wall || 0, target = Math.floor((wl - 2 * s.gap) / 10) * 10, w = Math.max(L.min, Math.min(L.max, wl ? target : 2000)), each = Math.round((wl - w) / 2);
+    const wallC = validate({ w, h: 750, d: 450, fronts: 'DDDD', finish: 'oak', base: 'plt', handle: 'psh' });
+    const result = !wl ? 'Enter your width.' : target > L.max ? `${w} mm is the widest in this prototype. ${each} mm each side.` : target < L.min ? `Narrowest is ${L.min} mm in this prototype.` : `${w} mm, made for your space. ${each} mm each side.`;
+    const defs = [
+      { name: 'Two metre oak', cfg: { w: 2000, h: 750, d: 450, fronts: 'DDDD', finish: 'oak', base: 'plt', handle: 'psh' } },
+      { name: 'Walnut, drawers at the centre', cfg: { w: 1800, h: 720, d: 450, fronts: 'DRD', finish: 'wal', base: 'leg', handle: 'grp' } },
+      { name: 'Deep green, low and long', cfg: { w: 2200, h: 650, d: 400, fronts: 'DRRD', finish: 'grn', base: 'mtl', handle: 'bar' } }
+    ];
+    const starts = defs.map(d => { const c = validate(d.cfg); return { name: d.name, cfg: JSON.stringify(c), spec: `${c.w} × ${c.h} × ${c.d} mm · ${K.byId(K.FINISHES, c.finish).name}`, price: 'From ' + K.fmt(K.price(c).amount), href: 'KR8A Configurator.dc.html?c=' + K.encode(c) }; });
+    const finishes = K.FINISHES.map(f => ({ name: f.name, blurb: f.blurb, st: { aspectRatio: '3/4', backgroundImage: `url(${K.swatch(f.id)})`, backgroundSize: 'cover', boxShadow: 'inset 0 0 0 1px rgba(27,25,22,.08), 0 10px 24px rgba(27,25,22,.12)' } }));
+    return {
+      ...base, heroPrice: K.fmt(K.price(K.validate(K.DEFAULT).config).amount), result, wallHref: 'KR8A Configurator.dc.html?c=' + K.encode(wallC), wallCfg: JSON.stringify(wallC), wallMm: wl,
+      opts: [['Tight', 20], ['Balanced', 50], ['Generous', 100]].map(([label, g]) => ({ label, sub: g + ' mm each side', on: s.gap === g, go: () => this.setState({ gap: g }) })),
+      starts, finishes, openCfg: JSON.stringify(validate({ w: 2000, h: 750, d: 450, fronts: 'DRRD'.replace('RR', 'DD'), finish: 'wal', base: 'leg', handle: 'psh', inside: ['I', 'S', 'V', 'S'] })),
+      onWall: e => this.setState({ wall: e.target.value.replace(/[^0-9]/g, '').slice(0, 4) })
+    };
+  }
+}
+</script>
+</body>
+</html>

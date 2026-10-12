@@ -1,338 +1,169 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, ContactShadows, Environment } from '@react-three/drei';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, ContactShadows, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
-import { SideboardConfig, FINISH_MAP } from '../lib/sideboardEngine';
+import { SideboardConfig, FINISHES, PANEL_MM, REVEAL_MM, baseHeight, bayWidth, carcassHeight } from '../lib/sideboardEngine';
 
-/** Panel thickness in meters (18 mm) */
-const T = 0.018;
+type View = 'three-quarter' | 'front' | 'side';
+type Props = { config: SideboardConfig; view?: View; onFrontClick?: (index: number) => void; className?: string };
+const mm = (value: number) => value / 1000;
 
-/** Reveal gap in meters (3 mm) */
-const R = 0.003;
-
-/** Plinth height in meters (60 mm) */
-const PH = 0.060;
-
-/** Plinth recess from front/back face in meters (50 mm) */
-const PRE = 0.050;
-
-/** Fixed viewing direction (normalised 3/4 view) */
-const VIEW_DIR = new THREE.Vector3(1, 0.65, 1).normalize();
-
-/** Framing margin multiplier */
-const FRAME_MARGIN = 1.35;
-
-/** Deterministic camera framing from model bounds */
-function Framing({ w, h, d }: { w: number; h: number; d: number }) {
-  const { camera, controls } = useThree();
-  const totalH = h + PH;
-
-  useEffect(() => {
-    const cam = camera as THREE.PerspectiveCamera;
-    const radius = Math.sqrt(w * w + totalH * totalH + d * d) / 2;
-    const fovRad = (cam.fov * Math.PI) / 180;
-    const dist = (radius / Math.sin(fovRad / 2)) * FRAME_MARGIN;
-
-    cam.position.copy(VIEW_DIR.clone().multiplyScalar(dist));
-    cam.updateProjectionMatrix();
-
-    if (controls) {
-      (controls as any).target.set(0, 0, 0);
-      (controls as any).update();
-    }
-  }, [w, totalH, d, camera, controls]);
-
-  return null;
+function Box({ size, position, color, metal = false, grain }: {
+  size: [number, number, number]; position: [number, number, number]; color: string; metal?: boolean; grain?: THREE.Texture | null;
+}) {
+  return <RoundedBox args={size} radius={Math.min(.0015, ...size.map(v => v / 5))} smoothness={2} castShadow receiveShadow position={position}>
+    <meshStandardMaterial color={color} roughness={metal ? .42 : .7} metalness={metal ? .58 : 0} map={grain || undefined} />
+  </RoundedBox>;
 }
 
-type Props = {
-  config: SideboardConfig;
-};
+function Camera({ config, view }: { config: SideboardConfig; view: View }) {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const w = mm(config.width), h = mm(config.height), d = mm(config.depth);
+    const radius = Math.sqrt(w * w + h * h + d * d) / 2;
+    const perspective = camera as THREE.PerspectiveCamera;
+    const fov = perspective.fov * Math.PI / 180;
+    const aspectFactor = Math.min(1, size.width / Math.max(size.height, 1));
+    const distance = radius / Math.sin(fov / 2) * (size.width < 900 ? Math.max(.8, 1.15 / Math.sqrt(size.width / Math.max(size.height, 1))) : aspectFactor < .8 ? 1.8 : 1.4);
+    const dir = view === 'front' ? [0, .12, 1] : view === 'side' ? [1, .15, .05] : [1, .55, 1];
+    const unit = new THREE.Vector3(...dir).normalize();
+    camera.position.copy(unit.multiplyScalar(distance));
+    camera.lookAt(0, size.width >= 900 ? -.72 : 0, 0);
+    camera.updateProjectionMatrix();
+  }, [camera, config.width, config.height, config.depth, size.width, size.height, view]);
+  return <OrbitControls makeDefault target={[0, size.width >= 900 ? -.72 : 0, 0]} enablePan={false} minDistance={1.5} maxDistance={10} maxPolarAngle={Math.PI * .53} />;
+}
 
-export default function Sideboard({ config }: Props) {
-  const w = config.width / 100;
-  const h = config.height / 100;
-  const d = config.depth / 100;
+function Door({ x, cy, frontZ, faceW, faceH, thickness, left, open, onClick, shell, grain, handle, handleColor }: {
+  x: number; cy: number; frontZ: number; faceW: number; faceH: number; thickness: number;
+  left: boolean; open: boolean; onClick: () => void; shell: string; grain: THREE.Texture | null;
+  handle: SideboardConfig['handle']; handleColor: string;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  const hingeX = x + (left ? -faceW / 2 : faceW / 2);
+  const shift = left ? faceW / 2 : -faceW / 2;
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.y = THREE.MathUtils.damp(ref.current.rotation.y, open ? (left ? -Math.PI * .48 : Math.PI * .48) : 0, 6, delta);
+  });
+  return <group ref={ref} position={[hingeX, cy, frontZ]} onClick={event => { event.stopPropagation(); onClick(); }} onPointerOver={() => { document.body.style.cursor = 'pointer'; }} onPointerOut={() => { document.body.style.cursor = ''; }}>
+    <Box size={[faceW, faceH, thickness]} position={[shift, 0, 0]} color={shell} grain={grain} />
+    {handle !== 'push' && <Box size={[handle === 'bar' ? .011 : .055, handle === 'bar' ? .12 : .008, .018]}
+      position={[shift + (left ? faceW * .37 : -faceW * .37), faceH * .24, thickness / 2 + .008]} color={handleColor} metal />}
+    {[-1, 1].map((level) => <group key={level} position={[0, level * (faceH / 2 - .105), -thickness / 2 - .012]}>
+      <Box size={[.032, .018, .025]} position={[left ? .008 : -.008, 0, 0]} color="#55534e" metal />
+      <Box size={[.014, .045, .012]} position={[left ? -.009 : .009, 0, -.01]} color="#77736c" metal />
+    </group>)}
+  </group>;
+}
 
-  const sideH = h + PH;              // Sides run from top cap to floor
-  const innerW = w - 2 * T;          // Width between sides
-  const innerD = d - 0.020;          // Internal bottom depth (stepped back 20mm)
-  const dividerH = h - 2 * T;        // Divider: bottom panel top to cap underside
+function Drawer({ x, y, frontZ, faceW, drawerH, depth, thickness, open, delay, shell, inside, grain, handle, handleColor, onClick }: {
+  x: number; y: number; frontZ: number; faceW: number; drawerH: number; depth: number; thickness: number;
+  open: boolean; delay: number; shell: string; inside: string; grain: THREE.Texture | null;
+  handle: SideboardConfig['handle']; handleColor: string; onClick: () => void;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.position.z = THREE.MathUtils.damp(ref.current.position.z, open ? .16 - delay : 0, open ? 4.5 : 3.1, delta);
+  });
+  const boxDepth = Math.max(.15, depth - .08);
+  return <group ref={ref} onClick={event => { event.stopPropagation(); onClick(); }} onPointerOver={() => { document.body.style.cursor = 'pointer'; }} onPointerOut={() => { document.body.style.cursor = ''; }}>
+    <Box size={[faceW, drawerH, thickness]} position={[x, y, frontZ]} color={shell} grain={grain} />
+    {handle !== 'push' && <Box size={[handle === 'bar' ? .11 : faceW * .36, .007, .014]} position={[x, y + drawerH * .18, frontZ + thickness / 2 + .009]} color={handleColor} metal />}
+    <Box size={[faceW - .04, .012, boxDepth]} position={[x, y - drawerH / 2 + .025, frontZ - boxDepth / 2]} color={inside} />
+    {[-1, 1].map(side => <Box key={side} size={[.012, drawerH * .7, boxDepth]} position={[x + side * (faceW / 2 - .026), y - .018, frontZ - boxDepth / 2]} color={inside} />)}
+    {[-1, 1].map(side => <Box key={`runner-${side}`} size={[.006, .01, boxDepth * .75]} position={[x + side * (faceW / 2 - .015), y - drawerH * .25, frontZ - boxDepth / 2]} color="#77736c" metal />)}
+  </group>;
+}
 
-  // Materials
-  // Procedural wood grain generator (memory-only, no image textures)
-  const { grainH, grainV } = useMemo(() => {
-    if (typeof document === 'undefined') return { grainH: null, grainV: null };
-    const createGrain = (vertical: boolean) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d')!;
-      ctx.fillStyle = '#ffffff'; // White base multiplies cleanly with the hex colors
-      ctx.fillRect(0, 0, 512, 512);
-      ctx.fillStyle = '#000000'; // Dark streaks
-      for (let i = 0; i < 500; i++) {
-        ctx.globalAlpha = Math.random() * 0.08 + 0.02;
-        if (vertical) {
-          ctx.fillRect(Math.random() * 512, 0, Math.random() * 2 + 0.5, 512);
-        } else {
-          ctx.fillRect(0, Math.random() * 512, 512, Math.random() * 2 + 0.5);
-        }
+function Model({ config, onFrontClick }: Pick<Props, 'config' | 'onFrontClick'>) {
+  const [openDoors, setOpenDoors] = useState<Record<number, boolean>>({});
+  const [openDrawers, setOpenDrawers] = useState<Record<number, boolean>>({});
+  useEffect(() => { setOpenDoors({}); setOpenDrawers({}); }, [config.fronts.join('')]);
+  const finish = FINISHES.find(f => f.id === config.finish) ?? FINISHES[0];
+  const interior = config.interior === 'match' ? finish : FINISHES.find(f => f.id === config.interior) ?? finish;
+  const grain = useMemo(() => {
+    if (!finish.grain || typeof document === 'undefined') return null;
+    const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 256;
+    const context = canvas.getContext('2d'); if (!context) return null;
+    context.fillStyle = '#ffffff'; context.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 180; i++) {
+      const x = (i * 47) % 256;
+      context.strokeStyle = `rgba(49,31,15,${.025 + (i % 7) * .006})`;
+      context.lineWidth = i % 17 === 0 ? 2 : .5;
+      context.beginPath(); context.moveTo(x, 0);
+      context.bezierCurveTo(x + (i % 5) * 2, 80, x - (i % 4) * 2, 160, x + (i % 3), 256);
+      context.stroke();
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, [finish.grain]);
+  useEffect(() => () => { grain?.dispose(); }, [grain]);
+  const w = mm(config.width), h = mm(config.height), d = mm(config.depth);
+  const bh = mm(baseHeight(config.base));
+  const ch = mm(carcassHeight(config));
+  const t = mm(PANEL_MM), reveal = mm(REVEAL_MM);
+  const cy = -h / 2 + bh + ch / 2;
+  const bayCount = config.fronts.length;
+  const bw = mm(bayWidth(config.width, bayCount));
+  const clearH = ch - 2 * t;
+  const frontZ = d / 2 + t / 2 - .006;
+  const bayX = (i: number) => -w / 2 + t + bw / 2 + i * (bw + t);
+  const shell = finish.color, inside = interior.color;
+  const handleColor = '#6a533c';
+  return <group>
+    {/* Carcass: panel measurements derive from the same normalized configuration as the review sheet. */}
+    <Box size={[w, t, d]} position={[0, cy + ch / 2 - t / 2, 0]} color={shell} grain={grain} />
+    <Box size={[w - 2 * t, t, d - t]} position={[0, cy - ch / 2 + t / 2, t / 2]} color={inside} />
+    {[-1, 1].map(side => <Box key={side} size={[t, ch - 2 * t, d]} position={[side * (w / 2 - t / 2), cy, 0]} color={shell} grain={grain} />)}
+    <Box size={[w - 2 * t, clearH, t]} position={[0, cy, -d / 2 + t / 2]} color={inside} />
+    {Array.from({ length: bayCount - 1 }, (_, i) => <Box key={`divider-${i}`} size={[t, clearH, d - t]} position={[(bayX(i) + bayX(i + 1)) / 2, cy, t / 2]} color={inside} />)}
+    {config.fronts.map((front, i) => {
+      const x = bayX(i);
+      const levels = front === 'R' ? 0 : config.inside[i] === 'V' ? 0 : config.shelves[i];
+      return <group key={`inside-${i}`}>
+        {Array.from({ length: levels }, (_, j) => <Box key={j} size={[bw - .008, t, d - 2 * t]} position={[x, cy - clearH / 2 + (j + 1) * clearH / (levels + 1), 0]} color={inside} />)}
+        {config.inside[i] === 'V' && front !== 'R' && [-1, 0, 1].map(v => <Box key={v} size={[t * .65, clearH * .65, d - 2 * t]} position={[x + v * bw / 4, cy - clearH * .175, 0]} color={inside} />)}
+        {config.inside[i] === 'I' && front === 'D' && [0, 1].map(j => <Box key={j} size={[bw - .025, clearH / 4, t]} position={[x, cy - clearH / 2 + (j + 1) * clearH / 3, d / 2 - .045]} color={inside} />)}
+      </group>;
+    })}
+    {config.fronts.map((front, i) => {
+      const x = bayX(i), faceW = bw - reveal, faceH = clearH - reveal;
+      if (front === 'O') return null;
+      if (front === 'R') {
+        const drawerH = (faceH - 2 * reveal) / 3;
+        return <group key={`front-${i}`}>
+          {[0, 1, 2].map(j => <Drawer key={j} x={x} y={cy + faceH / 2 - drawerH / 2 - j * (drawerH + reveal)} frontZ={frontZ}
+            faceW={faceW} drawerH={drawerH} depth={d} thickness={t} open={!!openDrawers[i]} delay={j * .014}
+            shell={shell} inside={inside} grain={grain} handle={config.handle} handleColor={handleColor}
+            onClick={() => { setOpenDrawers(o => ({ ...o, [i]: !o[i] })); onFrontClick?.(i); }} />)}
+        </group>;
       }
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.RepeatWrapping;
-      tex.colorSpace = (THREE as any).SRGBColorSpace || (THREE as any).sRGBEncoding;
-      return tex;
-    };
-    return { grainH: createGrain(false), grainV: createGrain(true) };
-  }, []);
+      const left = i < bayCount / 2;
+      return <Door key={`front-${i}`} x={x} cy={cy} frontZ={frontZ} faceW={faceW} faceH={faceH} thickness={t}
+        left={left} open={!!openDoors[i]} shell={shell} grain={grain} handle={config.handle} handleColor={handleColor}
+        onClick={() => { setOpenDoors(o => ({ ...o, [i]: !o[i] })); onFrontClick?.(i); }} />;
+    })}
+    {config.base === 'plinth' && <Box size={[w - .13, bh, d - .11]} position={[0, -h / 2 + bh / 2, -.014]} color={shell} />}
+    {(config.base === 'timber' || config.base === 'metal') && [-1, 1].flatMap(x => [-1, 1].map(z => <Box key={`${x}-${z}`} size={[config.base === 'metal' ? .018 : .04, bh, config.base === 'metal' ? .018 : .04]} position={[x * (w / 2 - .09), -h / 2 + bh / 2, z * (d / 2 - .07)]} color={config.base === 'metal' ? '#333734' : shell} metal={config.base === 'metal'} />))}
+  </group>;
+}
 
-  const shellOpt = FINISH_MAP[config.shellFinish] || FINISH_MAP['H1385 ST40 Natural Casella Oak'];
-  const innerOpt = FINISH_MAP[config.frontFinish] || FINISH_MAP['Mushroom'];
-
-  // Materials
-  const topCapMap = useMemo(() => {
-    if (!grainH) return undefined;
-    const tex = grainH.clone();
-    tex.repeat.set(w * 2, d * 2);
-    tex.needsUpdate = true;
-    return tex;
-  }, [grainH, w, d]);
-
-  const sideMap = useMemo(() => {
-    if (!grainV) return undefined;
-    const tex = grainV.clone();
-    tex.repeat.set(d * 2, sideH * 2);
-    tex.needsUpdate = true;
-    return tex;
-  }, [grainV, d, sideH]);
-
-  const outerMaterialH = (
-    <meshStandardMaterial 
-      color={shellOpt.color} 
-      roughness={shellOpt.roughness} 
-      metalness={shellOpt.metalness} 
-      map={topCapMap} 
-      bumpMap={topCapMap} 
-      bumpScale={0.001} 
-    />
-  );
-  const outerMaterialV = (
-    <meshStandardMaterial 
-      color={shellOpt.color} 
-      roughness={shellOpt.roughness} 
-      metalness={shellOpt.metalness} 
-      map={sideMap} 
-      bumpMap={sideMap} 
-      bumpScale={0.001} 
-    />
-  );
-  const innerMaterial = <meshStandardMaterial color={innerOpt.color} roughness={innerOpt.roughness} metalness={innerOpt.metalness} />;
-
-  // Parametric divider system
-  const dividerCount = config.dividerCount;
-  const bayCount = dividerCount + 1;
-  const bayW = (innerW - dividerCount * T) / bayCount;  // Even bay width
-  const dividerXPositions = Array.from({ length: dividerCount }, (_, i) =>
-    -innerW / 2 + (i + 1) * bayW + (i + 0.5) * T
-  );
-
-  const bayBackH = h - 2 * T;        // Bay back: overall height minus 36mm
-
-  // Shelf geometry (one per bay)
-  const shelfClearance = 0.002;                       // 2mm clearance each side
-  const shelfW = bayW - 2 * shelfClearance;           // Bay width minus clearance
-  const shelfY = -T / 2;                              // Centered vertically
-  const shelfZ = -0.010;                              // Same Z as internal panels
-
-  // Inset door geometry
-  const S = 0.002;                            // Front setback: 2mm inset behind side fronts
-  const doorW = (innerW - (bayCount + 1) * R) / bayCount; // Each door: inner width minus reveals
-  const doorH = h - T - R;                   // Flush bottom to 3mm below applied top cap underside
-  const doorCZ = d / 2 - T / 2 - S;          // Inset: 2mm behind side panel front faces
-  const doorCY = -T / 2 - R / 2;             // Center Y: flush bottom + top reveal from cap
-
-  // TAU Handle geometry
-  const handleW = 0.012;                     // 12mm slim vertical profile
-  const handleH = 0.160;                     // 160mm tall pull
-  const handleD = 0.024;                     // 24mm deep
-  const handleMargin = 0.035;                // 35mm inset from the opening edge
-  const handleY = doorH * 0.15;              // Centered in the upper-middle zone
-  const handleZ = T / 2 + handleD / 2;       // Pushing out from the front face of the door
-
-  // Plinth underframe geometry — recessed horizontal rails
-  const plinthRailW = innerW;                         // Rail width: between side panels
-  const plinthFrontZ = d / 2 - PRE;                   // Front rail Z: recessed 50mm from front
-  const plinthBackZ = -d / 2 + PRE;                   // Back rail Z: recessed 50mm from back
-  const torsionRailD = plinthFrontZ - plinthBackZ - T; // Torsion rail depth: between inner faces of horiz rails
-  const plinthCY = -h / 2 - PH / 2;                   // Plinth center Y (in shifted space)
-
-  return (
-    <div className="w-full h-full bg-[#f5f5f7]">
-      <Canvas shadows camera={{ position: [3, 2, 3], fov: 35 }}>
-        {/* Soft premium studio lighting */}
-        <ambientLight intensity={0.5} />
-        <Environment preset="studio" environmentIntensity={0.25} />
-        <directionalLight 
-          position={[-4, 6, 6]} 
-          intensity={1.4} 
-          castShadow 
-          shadow-mapSize={[2048, 2048]}
-          shadow-bias={-0.0001}
-        >
-          <orthographicCamera attach="shadow-camera" args={[-2.5, 2.5, 2.5, -2.5, 0.1, 20]} />
-        </directionalLight> {/* Bright soft key light from upper front-left */}
-        <directionalLight position={[5, 4, 4]} intensity={0.6} /> {/* Softer fill light from upper front-right */}
-        <directionalLight position={[10, 2, 2]} intensity={0.4} /> {/* Gentle side fill to lift shell textures */}
-        <directionalLight position={[0, 5, -6]} intensity={0.4} /> {/* Subtle rim / separation light from above-rear */}
-
-        {/* Premium contact shadow under the cabinet footprint */}
-        <ContactShadows
-          position={[0, -h / 2 - PH / 2 + 0.001, 0]}
-          opacity={0.9}
-          scale={w * 2.5}
-          blur={2.4}
-          resolution={1024}
-          far={h}
-          color="#000000"
-        />
-
-        {/* Solid neutral floor plane with built-in shadow receiving */}
-        <mesh position={[0, -h / 2 - PH / 2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[100, 100]} />
-          <meshStandardMaterial color="#f0f0f2" roughness={1} metalness={0} />
-        </mesh>
-
-        {/* Subtle studio backdrop plane */}
-        <mesh position={[0, 0, -d * 4]} rotation={[0, 0, 0]}>
-          <planeGeometry args={[100, 100]} />
-          <meshBasicMaterial color="#e5e5e7" />
-        </mesh>
-
-        <Framing w={w} h={h} d={d} />
-
-        {/* Outer group: shift everything up by PH/2 to keep assembly centered */}
-        <group position={[0, PH / 2, 0]}>
-
-          {/* ── Cabinet body ── */}
-          <group>
-            {/* Applied top cap — full width, full depth, sits on top */}
-            <mesh castShadow receiveShadow position={[0, h / 2 - T / 2, 0]}>
-              <boxGeometry args={[w, T, d]} />
-              {outerMaterialH}
-            </mesh>
-
-            {/* Left side panel — full depth, runs from top cap down to floor */}
-            <mesh castShadow receiveShadow position={[-w / 2 + T / 2, -PH / 2, 0]}>
-              <boxGeometry args={[T, sideH, d]} />
-              {outerMaterialV}
-            </mesh>
-
-            {/* Right side panel — mirror of left */}
-            <mesh castShadow receiveShadow position={[w / 2 - T / 2, -PH / 2, 0]}>
-              <boxGeometry args={[T, sideH, d]} />
-              {outerMaterialV}
-            </mesh>
-
-            {/* Internal bottom panel — between sides, stepped back 20mm */}
-            <mesh castShadow receiveShadow position={[0, -h / 2 + T / 2, -0.010]}>
-              <boxGeometry args={[innerW, T, innerD]} />
-              {innerMaterial}
-            </mesh>
-
-            {/* Parametric inset back panels — one per bay */}
-            {Array.from({ length: bayCount }, (_, i) => {
-              const cx = -innerW / 2 + i * (bayW + T) + bayW / 2;
-              return (
-                <mesh castShadow receiveShadow key={`back-panel-${i + 1}`} position={[cx, 0, -d / 2 + T / 2]}>
-                  <boxGeometry args={[bayW, bayBackH, T]} />
-                  {innerMaterial}
-                </mesh>
-              );
-            })}
-
-            {/* Parametric vertical dividers */}
-            {dividerXPositions.map((x, i) => (
-              <mesh castShadow receiveShadow key={`divider-${i + 1}`} position={[x, 0, -0.010]}>
-                <boxGeometry args={[T, dividerH, innerD]} />
-                {innerMaterial}
-              </mesh>
-            ))}
-
-            {/* Parametric bay shelves — one per bay */}
-            {Array.from({ length: bayCount }, (_, i) => {
-              const cx = -innerW / 2 + i * (bayW + T) + bayW / 2;
-              return (
-                <mesh castShadow receiveShadow key={`shelf-${i + 1}`} position={[cx, shelfY, shelfZ]}>
-                  <boxGeometry args={[shelfW, T, innerD]} />
-                  {innerMaterial}
-                </mesh>
-              );
-            })}
-
-            {/* Parametric inset doors — one per bay, open for inspection */}
-            {Array.from({ length: bayCount }, (_, i) => {
-              const cx = -innerW / 2 + R + i * (doorW + R) + doorW / 2;
-              const isHingedLeft = i < bayCount / 2;
-              const hingeX = isHingedLeft ? cx - doorW / 2 : cx + doorW / 2;
-              const hingeRot = 0; // Return doors to closed neutral position
-              const meshShift = isHingedLeft ? doorW / 2 : -doorW / 2;
-              const handleX = isHingedLeft ? doorW - handleMargin - handleW / 2 : -doorW + handleMargin + handleW / 2;
-
-              return (
-                <group
-                  key={`door-${i + 1}`}
-                  position={[hingeX, doorCY, doorCZ]}
-                  rotation={[0, hingeRot, 0]}
-                >
-                  <mesh castShadow receiveShadow position={[meshShift, 0, 0]}>
-                    <boxGeometry args={[doorW, doorH, T]} />
-                    {innerMaterial}
-                  </mesh>
-                  {/* TAU Handle */}
-                  <mesh castShadow receiveShadow position={[handleX, handleY, handleZ]}>
-                    <boxGeometry args={[handleW, handleH, handleD]} />
-                    <meshStandardMaterial color="#2c2c2e" roughness={0.5} metalness={0.4} />
-                  </mesh>
-                </group>
-              );
-            })}
-          </group>
-
-          {/* ── Plinth underframe — recessed horizontal rails ── */}
-          <group>
-            {/* Front horizontal rail — runs left-to-right, recessed behind front face */}
-            <mesh castShadow receiveShadow position={[0, plinthCY, plinthFrontZ]}>
-              <boxGeometry args={[plinthRailW, PH, T]} />
-              {innerMaterial}
-            </mesh>
-
-            {/* Back horizontal rail — runs left-to-right, recessed behind back face */}
-            <mesh castShadow receiveShadow position={[0, plinthCY, plinthBackZ]}>
-              <boxGeometry args={[plinthRailW, PH, T]} />
-              {innerMaterial}
-            </mesh>
-
-            {/* Centre torsion rail — runs front-to-back between horizontal rails */}
-            <mesh castShadow receiveShadow position={[0, plinthCY, (plinthFrontZ + plinthBackZ) / 2]}>
-              <boxGeometry args={[T, PH, torsionRailD]} />
-              {innerMaterial}
-            </mesh>
-          </group>
-
-        </group>
-
-        <OrbitControls
-          makeDefault
-          target={[0, 0, 0]}
-          enableRotate={true}
-          enableZoom={true}
-          enablePan={false}
-        />
-      </Canvas>
-    </div>
-  );
+export default function Sideboard({ config, view = 'three-quarter', onFrontClick, className = '' }: Props) {
+  return <div className={`viewer ${className}`} aria-label="Interactive 3D sideboard. Drag to rotate; click doors or drawers to open them.">
+    <Canvas shadows dpr={[1, 1.8]} camera={{ fov: 35, position: [3, 2, 3] }}>
+      <color attach="background" args={['#e8e0d2']} />
+      <ambientLight intensity={.9} />
+      <directionalLight position={[-3, 6, 5]} intensity={2} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-.0002} />
+      <directionalLight position={[5, 4, -3]} intensity={.65} />
+      <ContactShadows position={[0, -config.height / 2000 - .001, 0]} opacity={.35} scale={4} blur={2.5} far={1.5} color="#3d342a" />
+      <mesh receiveShadow position={[0, -config.height / 2000 - .002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[100, 100]} /><meshStandardMaterial color="#e8e0d2" roughness={1} />
+      </mesh>
+      <Model config={config} onFrontClick={onFrontClick} />
+      <Camera config={config} view={view} />
+    </Canvas>
+  </div>;
 }
