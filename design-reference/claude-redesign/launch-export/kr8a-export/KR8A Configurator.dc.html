@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Libre+Caslon+Display&amp;display=swap">
+<script src="./kr8a-engine.js"></script>
+<style>
+html,body{margin:0;background:#ECE7DF;color:#1B1916;-webkit-font-smoothing:antialiased}
+a{color:#1B1916}a:hover{color:#6A6259}
+button{font:inherit;color:inherit}
+button:disabled{cursor:default}
+button:focus-visible,input:focus-visible{outline:1.5px solid #1B1916;outline-offset:3px}
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
+@keyframes kr8aIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="{{ outerSt }}">
+<div style="{{ shellSt }}">
+
+  <div style="{{ stageSt }}">
+    <x-import component-from-global-scope="kr8a-viewer" from="./kr8a-viewer.js" config="{{ cfgJson }}" view="{{ view }}" opened="{{ opened }}" dims="{{ dimsS }}" idle="{{ idleS }}" pad="{{ pad }}" top="{{ topPad }}" wall="{{ wallMm }}" spin="{{ spinS }}" hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+  </div>
+
+  <header style="{{ topSt }}">
+    <div style="display:flex;align-items:center;gap:18px;pointer-events:auto;min-width:0">
+      <a href="KR8A Homepage.dc.html" style="font-family:Geist,sans-serif;font-weight:600;font-size:15px;letter-spacing:.34em;text-decoration:none;color:#1B1916">KR8A</a>
+      <span style="width:1px;height:14px;background:rgba(27,25,22,.25)"></span>
+      <label style="display:flex;align-items:baseline;gap:10px;min-width:0">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259">Sideboard</span>
+        <input value="{{ name }}" onChange="{{ onName }}" placeholder="Name your piece" aria-label="Name your sideboard" style="background:transparent;border:0;font-family:'Libre Caslon Display',serif;font-size:17px;color:#1B1916;width:180px;padding:2px 0;min-width:0">
+      </label>
+    </div>
+    <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:28px;pointer-events:auto">
+        <sc-if value="{{ showPrice }}" hint-placeholder-val="{{ true }}">
+          <div style="text-align:right">
+            <div style="display:flex;align-items:baseline;justify-content:flex-end;gap:10px">
+              <sc-if value="{{ delta }}"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6A6259;animation:kr8aIn .4s ease">{{ delta }}</span></sc-if>
+              <span style="font-family:'Libre Caslon Display',serif;font-size:40px;line-height:1;font-variant-numeric:tabular-nums">{{ priceText }}</span>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;margin-top:8px;white-space:nowrap">Illustrative · made to your specification</div>
+          </div>
+        </sc-if>
+        <button onClick="{{ openSummary }}" style="background:#1B1916;color:#F4F0EA;border:0;padding:16px 26px;font-size:13px;font-weight:500;letter-spacing:.02em;cursor:pointer;border-radius:1px;white-space:nowrap">Review design</button>
+      </div>
+    </sc-if>
+  </header>
+
+  <nav aria-label="View" style="{{ railSt }}">
+    <sc-for list="{{ views }}" as="v" hint-placeholder-count="4">
+      <button onClick="{{ v.go }}" aria-pressed="{{ v.on }}" style="background:transparent;border:0;padding:8px 0;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;min-height:32px;flex:0 0 auto">
+        <sc-if value="{{ v.on }}"><span style="width:18px;height:1px;background:#1B1916"></span><span style="color:#1B1916">{{ v.label }}</span></sc-if>
+        <sc-if value="{{ v.off }}"><span style="width:8px;height:1px;background:rgba(27,25,22,.3)"></span><span style="color:#6A6259">{{ v.label }}</span></sc-if>
+      </button>
+    </sc-for>
+    <span style="{{ railGapSt }}"></span>
+    <sc-for list="{{ toggles }}" as="v" hint-placeholder-count="2">
+      <button onClick="{{ v.go }}" aria-pressed="{{ v.on }}" style="background:transparent;border:0;padding:8px 0;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;min-height:32px;flex:0 0 auto">
+        <span style="width:12px;height:12px;border:1px solid #1B1916;display:grid;place-items:center;border-radius:50%">
+          <sc-if value="{{ v.on }}"><span style="width:6px;height:6px;background:#1B1916;border-radius:50%"></span></sc-if>
+        </span>
+        <span style="color:#1B1916">{{ v.label }}</span>
+      </button>
+    </sc-for>
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;padding:8px 0 0">In your room · soon</span>
+    </sc-if>
+  </nav>
+
+  <sc-if value="{{ toast }}">
+    <div role="status" style="{{ toastSt }}">{{ toast }}</div>
+  </sc-if>
+
+  <div ref="{{ dockRef }}" style="{{ dockSt }}">
+    <sc-if value="{{ hasTray }}" hint-placeholder-val="{{ true }}">
+      <section aria-label="{{ chapterTitle }}" style="{{ traySt }}">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:22px">
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+            <h2 style="margin:0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:26px">{{ chapterTitle }}</h2>
+            <span style="font-size:13px;color:#6A6259">{{ chapterHint }}</span>
+          </div>
+          <sc-if value="{{ desk }}"><button onClick="{{ closeTray }}" style="background:transparent;border:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;padding:6px 0">Hide</button></sc-if>
+        </div>
+
+        <sc-if value="{{ isSize }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ sizeGridSt }}">
+            <sc-for list="{{ sliders }}" as="s" hint-placeholder-count="3">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259"><span>{{ s.label }}</span><span>{{ s.range }}</span></div>
+                <div style="display:flex;align-items:baseline;gap:6px;margin:10px 0 4px"><span style="font-family:'Libre Caslon Display',serif;font-size:40px;line-height:1;font-variant-numeric:tabular-nums">{{ s.val }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6A6259">mm</span><span style="margin-left:auto;font-size:12px;color:#6A6259">{{ s.caption }}</span></div>
+                <div style="position:relative;height:44px">
+                  <div style="position:absolute;left:0;right:0;top:21px;height:1px;background:rgba(27,25,22,.2)"></div>
+                  <div style="position:absolute;left:0;right:0;top:28px;display:flex;justify-content:space-between"><span style="width:1px;height:5px;background:rgba(27,25,22,.3)"></span><span style="width:1px;height:3px;background:rgba(27,25,22,.2)"></span><span style="width:1px;height:3px;background:rgba(27,25,22,.2)"></span><span style="width:1px;height:3px;background:rgba(27,25,22,.2)"></span><span style="width:1px;height:5px;background:rgba(27,25,22,.3)"></span><span style="width:1px;height:3px;background:rgba(27,25,22,.2)"></span><span style="width:1px;height:3px;background:rgba(27,25,22,.2)"></span><span style="width:1px;height:3px;background:rgba(27,25,22,.2)"></span><span style="width:1px;height:5px;background:rgba(27,25,22,.3)"></span></div>
+                  <div style="{{ s.fillSt }}"></div>
+                  <div style="{{ s.thumbSt }}"></div>
+                  <input type="range" min="{{ s.min }}" max="{{ s.max }}" step="{{ s.step }}" value="{{ s.val }}" onInput="{{ s.onInput }}" onChange="{{ s.onInput }}" onFocus="{{ s.onFocus }}" onBlur="{{ s.onBlur }}" aria-label="{{ s.aria }}" style="position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize">
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(27,25,22,.1);display:flex;justify-content:space-between;align-items:flex-end;gap:18px 32px;flex-wrap:wrap">
+            <div style="min-width:220px;flex:1 1 220px"><div style="font-family:'Libre Caslon Display',serif;font-size:24px;line-height:1.1">How wide is your space?</div><div style="font-size:13px;color:#6A6259;margin-top:8px;max-width:340px;text-wrap:pretty">{{ fitMsg }}</div></div>
+            <div style="display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap">
+              <label style="display:flex;align-items:baseline;gap:6px;border-bottom:1px solid #1B1916;padding:6px 0;margin-right:6px">
+                <input inputmode="numeric" value="{{ wall }}" onChange="{{ onWall }}" onKeyDown="{{ onWallKey }}" placeholder="2380" aria-label="Wall or alcove width in millimetres" style="border:0;background:transparent;font-family:'Libre Caslon Display',serif;font-size:26px;width:84px;color:#1B1916">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6A6259">mm</span>
+              </label>
+              <sc-for list="{{ wallOpts }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.go }}" aria-pressed="{{ o.on }}" style="position:relative;background:transparent;border:0;padding:8px 12px;cursor:pointer;text-align:left;min-height:44px">
+                  <sc-if value="{{ o.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                  <span style="display:block;font-size:13px;font-weight:500">{{ o.label }}</span><span style="display:block;font-size:11px;color:#6A6259;margin-top:2px">{{ o.sub }}</span>
+                </button>
+              </sc-for>
+              <button onClick="{{ onFit }}" style="background:#1B1916;color:#F4F0EA;border:0;padding:0 20px;height:44px;font-size:13px;font-weight:500;cursor:pointer">Fit my sideboard</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFronts }}">
+          <div style="{{ layoutGridSt }}">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;margin-bottom:12px">Bays</div>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ bayOpts }}" as="b" hint-placeholder-count="3">
+                  <button onClick="{{ b.go }}" disabled="{{ b.off }}" title="{{ b.reason }}" style="position:relative;background:transparent;border:0;padding:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:72px">
+                    <sc-if value="{{ b.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                    <span style="display:flex;gap:1px;padding:1px;background:#1B1916;width:56px;height:26px"><sc-for list="{{ b.cells }}" as="x"><span style="flex:1;background:#F6F3EE"></span></sc-for></span>
+                    <span style="font-size:13px">{{ b.label }}</span>
+                    <sc-if value="{{ b.off }}"><span style="position:absolute;inset:0;background:rgba(246,243,238,.72)"></span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="font-size:12px;color:#6A6259;margin-top:8px;max-width:250px;text-wrap:pretty">{{ bayNote }}</div>
+            </div>
+            <div style="min-width:0">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;margin-bottom:12px">Arrangement</div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap">
+                <sc-for list="{{ patterns }}" as="p" hint-placeholder-count="4">
+                  <button onClick="{{ p.go }}" disabled="{{ p.off }}" style="position:relative;background:transparent;border:0;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+                    <sc-if value="{{ p.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                    <span style="display:flex;gap:1px;padding:1px;background:#1B1916;width:92px;height:36px">
+                      <sc-for list="{{ p.cells }}" as="x">
+                        <span style="flex:1;display:flex;flex-direction:column;gap:1px;background:#1B1916">
+                          <sc-if value="{{ x.isD }}"><span style="flex:1;background:#F6F3EE"></span></sc-if>
+                          <sc-if value="{{ x.isR }}"><span style="flex:1;background:#F6F3EE"></span><span style="flex:1;background:#F6F3EE"></span><span style="flex:1;background:#F6F3EE"></span></sc-if>
+                          <sc-if value="{{ x.isO }}"><span style="flex:1;background:#CFC6B8"></span><span style="flex:1;background:#CFC6B8"></span></sc-if>
+                        </span>
+                      </sc-for>
+                    </span>
+                    <span style="font-size:13px">{{ p.label }}</span>
+                    <sc-if value="{{ p.off }}"><span style="position:absolute;inset:0;background:rgba(246,243,238,.72)"></span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(27,25,22,.1)">
+            <div style="display:flex;justify-content:space-between;gap:12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;margin-bottom:12px"><span>Tap a bay to change its front</span><span>{{ frontsText }}</span></div>
+            <div style="display:flex;gap:1px;padding:1px;background:#1B1916;height:60px">
+              <sc-for list="{{ bayCells }}" as="x" hint-placeholder-count="4">
+                <button onClick="{{ x.go }}" aria-label="{{ x.aria }}" style="flex:1;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:1px;background:#1B1916">
+                  <sc-if value="{{ x.isD }}"><span style="flex:1;background:#F6F3EE;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6A6259">Door</span></sc-if>
+                  <sc-if value="{{ x.isR }}"><span style="flex:1;background:#F6F3EE"></span><span style="flex:1;background:#F6F3EE;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6A6259">Drawers</span><span style="flex:1;background:#F6F3EE"></span></sc-if>
+                  <sc-if value="{{ x.isO }}"><span style="flex:1;background:#D8D0C3;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#1B1916">Open</span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isInside }}">
+          <div style="{{ insideGridSt }}">
+            <div style="min-width:0">
+              <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;margin-bottom:12px"><span>Choose a bay</span><span>{{ selLabel }}</span></div>
+              <div style="display:flex;gap:6px;height:104px">
+                <sc-for list="{{ insideCells }}" as="x" hint-placeholder-count="4">
+                  <button onClick="{{ x.go }}" aria-pressed="{{ x.sel }}" aria-label="{{ x.aria }}" style="position:relative;flex:1;border:0;padding:6px;cursor:pointer;background:transparent;display:flex">
+                    <sc-if value="{{ x.sel }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                    <span style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly;background:#E4DDD2;box-shadow:inset 0 0 0 1px rgba(27,25,22,.35);position:relative;overflow:hidden">
+                      <sc-if value="{{ x.isS }}"><sc-for list="{{ x.lines }}" as="l"><span style="height:2px;background:#1B1916;margin:0 5px"></span></sc-for></sc-if>
+                      <sc-if value="{{ x.isI }}"><span style="position:absolute;left:5px;right:5px;bottom:5px;height:22%;border:1px solid #1B1916"></span><span style="position:absolute;left:5px;right:5px;bottom:calc(22% + 8px);height:22%;border:1px solid #1B1916"></span><sc-if value="{{ x.hasShelf }}"><span style="position:absolute;left:5px;right:5px;top:24%;height:2px;background:#1B1916"></span></sc-if></sc-if>
+                      <sc-if value="{{ x.isV }}"><span style="position:absolute;left:8px;right:8px;bottom:0;height:78%;display:flex;justify-content:space-evenly"><span style="width:1.5px;background:#1B1916"></span><span style="width:1.5px;background:#1B1916"></span><span style="width:1.5px;background:#1B1916"></span></span></sc-if>
+                      <sc-if value="{{ x.isR }}"><span style="position:absolute;inset:0;background:#F6F3EE;display:flex;flex-direction:column;gap:3px;padding:6px"><span style="flex:1;border:1px solid rgba(27,25,22,.5)"></span><span style="flex:1;border:1px solid rgba(27,25,22,.5)"></span><span style="flex:1;border:1px solid rgba(27,25,22,.5)"></span></span></sc-if>
+                    </span>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="margin-top:14px">
+                <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259"><span>Shelf height · all bays</span><span>{{ spText }}</span></div>
+                <div style="position:relative;height:36px">
+                  <div style="position:absolute;left:0;right:0;top:17px;height:1px;background:rgba(27,25,22,.2)"></div>
+                  <div style="position:absolute;left:50%;top:12px;width:1px;height:11px;background:rgba(27,25,22,.3)"></div>
+                  <div style="{{ spThumbSt }}"></div>
+                  <input type="range" min="-50" max="50" step="5" value="{{ sp }}" onInput="{{ onSp }}" onChange="{{ onSp }}" aria-label="Shelf height" style="position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize">
+                </div>
+              </div>
+            </div>
+            <div style="min-width:0">
+              <sc-if value="{{ selIsR }}">
+                <div style="font-size:14px;line-height:1.5;color:#1B1916;max-width:300px;text-wrap:pretty">This bay is three drawers on soft-close, full-extension runners. Change its front in <button onClick="{{ goFronts }}" style="background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px">Fronts</button> to fit it out differently.</div>
+              </sc-if>
+              <sc-if value="{{ selNotR }}">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;margin-bottom:10px">Fit out {{ selLabel }}</div>
+                <div style="display:flex;flex-direction:column">
+                  <sc-for list="{{ insideOpts }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.go }}" disabled="{{ o.off }}" aria-pressed="{{ o.on }}" style="background:transparent;border:0;border-top:1px solid rgba(27,25,22,.1);padding:11px 0;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;min-height:48px">
+                      <span style="width:14px;height:14px;border:1px solid #1B1916;border-radius:50%;display:grid;place-items:center;flex:0 0 auto"><sc-if value="{{ o.on }}"><span style="width:8px;height:8px;border-radius:50%;background:#1B1916"></span></sc-if></span>
+                      <span style="flex:1"><span style="display:block;font-size:13px;font-weight:500">{{ o.name }}</span><span style="display:block;font-size:12px;color:#6A6259;margin-top:2px">{{ o.note }}</span></span>
+                      <sc-if value="{{ o.stepper }}">
+                        <span style="display:flex;align-items:center;gap:4px">
+                          <span role="button" tabindex="0" onClick="{{ shelfMinus }}" aria-label="Fewer shelves" style="width:32px;height:32px;display:grid;place-items:center;font-size:16px;cursor:pointer">−</span>
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;width:14px;text-align:center">{{ selShelves }}</span>
+                          <span role="button" tabindex="0" onClick="{{ shelfPlus }}" aria-label="More shelves" style="width:32px;height:32px;display:grid;place-items:center;font-size:16px;cursor:pointer">+</span>
+                        </span>
+                      </sc-if>
+                    </button>
+                  </sc-for>
+                </div>
+                <button onClick="{{ applyAll }}" style="margin-top:6px;background:transparent;border:0;padding:8px 0;cursor:pointer;font-size:12px;text-decoration:underline;text-underline-offset:4px;color:#1B1916">Use this fit-out in every door bay</button>
+              </sc-if>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:10px;padding-top:12px;border-top:1px solid rgba(27,25,22,.1)">
+                <button onClick="{{ toggleLight }}" aria-pressed="{{ lightOn }}" style="background:transparent;border:0;padding:6px 0;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left">
+                  <span style="width:32px;height:18px;border:1px solid #1B1916;border-radius:9px;position:relative;flex:0 0 auto"><span style="{{ lightKnobSt }}"></span></span>
+                  <span style="font-size:13px;font-weight:500">Interior light</span>
+                </button>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#6A6259;text-align:right">Soft-close throughout</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFinish }}">
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:-6px 0 16px"><span style="font-family:'Libre Caslon Display',serif;font-size:22px">{{ finishName }}</span><span style="font-size:14px;color:#3D3832">{{ finishBlurb }}</span></div>
+          <div style="display:flex;gap:12px;overflow-x:auto;padding:4px 4px 6px;margin:0 -4px">
+            <sc-for list="{{ finishes }}" as="f" hint-placeholder-count="6">
+              <button onClick="{{ f.go }}" aria-pressed="{{ f.on }}" style="background:transparent;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:10px;text-align:left;flex:0 0 auto">
+                <span style="position:relative;display:block;padding:5px">
+                  <sc-if value="{{ f.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                  <span style="{{ f.imgSt }}"></span>
+                </span>
+                <span style="padding:0 5px"><span style="display:block;font-size:13px;font-weight:500">{{ f.name }}</span><span style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6A6259;margin-top:3px">{{ f.family }}</span></span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid rgba(27,25,22,.1)">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259">Inside</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ interiors }}" as="f" hint-placeholder-count="4">
+                <button onClick="{{ f.go }}" aria-pressed="{{ f.on }}" style="position:relative;background:transparent;border:0;padding:5px 10px 5px 5px;cursor:pointer;display:flex;align-items:center;gap:8px">
+                  <sc-if value="{{ f.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                  <span style="{{ f.imgSt }}"></span><span style="font-size:12px">{{ f.name }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin:12px 0 0;font-size:12px;color:#6A6259">Design explorations. Production finishes and samples to be confirmed.</p>
+        </sc-if>
+
+        <sc-if value="{{ isBase }}">
+          <div style="display:flex;gap:6px;overflow-x:auto">
+            <sc-for list="{{ bases }}" as="b" hint-placeholder-count="4">
+              <button onClick="{{ b.go }}" aria-pressed="{{ b.on }}" style="position:relative;background:transparent;border:0;padding:16px;cursor:pointer;display:flex;flex-direction:column;gap:14px;text-align:left;flex:1 0 150px">
+                <sc-if value="{{ b.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                <span style="display:flex;flex-direction:column;width:112px;height:56px;justify-content:flex-end">
+                  <span style="height:30px;background:#1B1916"></span>
+                  <sc-if value="{{ b.isMtl }}"><span style="height:18px;display:flex;justify-content:space-between;padding:0 3px"><span style="width:1.5px;background:#1B1916"></span><span style="width:1.5px;background:#1B1916"></span><span style="width:1.5px;background:#1B1916"></span></span></sc-if>
+                  <sc-if value="{{ b.isLeg }}"><span style="height:20px;display:flex;justify-content:space-between;padding:0 8px"><span style="width:5px;background:#1B1916;clip-path:polygon(0 0,100% 0,80% 100%,20% 100%)"></span><span style="width:5px;background:#1B1916;clip-path:polygon(0 0,100% 0,80% 100%,20% 100%)"></span></span></sc-if>
+                  <sc-if value="{{ b.isPlt }}"><span style="height:9px;margin:0 4px;background:#1B1916;opacity:.75"></span></sc-if>
+                  <sc-if value="{{ b.isFlt }}"><span style="height:14px;margin:0 22px;background:#1B1916;opacity:.55"></span></sc-if>
+                </span>
+                <span><span style="display:block;font-size:13px;font-weight:500">{{ b.name }}</span><span style="display:block;font-size:12px;color:#6A6259;margin-top:3px">{{ b.note }}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isHandles }}">
+          <div style="display:flex;gap:6px;overflow-x:auto">
+            <sc-for list="{{ handles }}" as="b" hint-placeholder-count="3">
+              <button onClick="{{ b.go }}" aria-pressed="{{ b.on }}" style="position:relative;background:transparent;border:0;padding:16px;cursor:pointer;display:flex;gap:18px;align-items:center;text-align:left;flex:1 0 200px">
+                <sc-if value="{{ b.on }}"><span style="position:absolute;inset:0;border:1px solid #1B1916"></span></sc-if>
+                <span style="position:relative;width:44px;height:62px;border:1px solid #1B1916;flex:0 0 auto;background:#F6F3EE">
+                  <sc-if value="{{ b.isGrp }}"><span style="position:absolute;left:-1px;right:-1px;top:-1px;height:7px;background:#1B1916;opacity:.22"></span></sc-if>
+                  <sc-if value="{{ b.isBar }}"><span style="position:absolute;right:7px;top:8px;width:2px;height:20px;background:#7A5C3C"></span></sc-if>
+                  <sc-if value="{{ b.isPsh }}"><span style="position:absolute;right:8px;top:10px;width:5px;height:5px;border:1px solid #1B1916;border-radius:50%"></span></sc-if>
+                </span>
+                <span><span style="display:block;font-size:13px;font-weight:500">{{ b.name }}</span><span style="display:block;font-size:12px;color:#6A6259;margin-top:3px">{{ b.note }}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <nav aria-label="Configure" style="{{ navSt }}">
+      <sc-for list="{{ chapters }}" as="c" hint-placeholder-count="6">
+        <button onClick="{{ c.go }}" aria-current="{{ c.cur }}" style="position:relative;background:transparent;border:0;padding:12px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:3px;flex:0 0 auto;min-height:48px;justify-content:center">
+          <sc-if value="{{ c.on }}">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:#1B1916">{{ c.num }}</span>
+            <span style="font-size:13px;font-weight:500;color:#1B1916">{{ c.label }}</span>
+            <span style="position:absolute;left:16px;right:16px;bottom:5px;height:1.5px;background:#1B1916"></span>
+          </sc-if>
+          <sc-if value="{{ c.off }}">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:#6A6259">{{ c.num }}</span>
+            <span style="font-size:13px;color:#1B1916">{{ c.label }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </nav>
+
+    <sc-if value="{{ mob }}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px 26px;border-top:1px solid rgba(27,25,22,.1);background:#F6F3EE">
+        <div>
+          <sc-if value="{{ showPrice }}">
+            <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Libre Caslon Display',serif;font-size:30px;line-height:1;font-variant-numeric:tabular-nums">{{ priceText }}</span><sc-if value="{{ delta }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#6A6259">{{ delta }}</span></sc-if></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#6A6259;margin-top:6px">Illustrative price</div>
+          </sc-if>
+        </div>
+        <button onClick="{{ openSummary }}" style="background:#1B1916;color:#F4F0EA;border:0;padding:0 24px;height:52px;font-size:14px;font-weight:500;cursor:pointer;border-radius:1px">Review</button>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:36px;bottom:34px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6A6259;pointer-events:none;max-width:170px;line-height:1.7">Drag to rotate<br>Click a front to open it</div>
+    <div style="position:absolute;right:36px;bottom:30px;display:flex;align-items:center;gap:18px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#6A6259">{{ code }}</span>
+      <button onClick="{{ reset }}" style="background:transparent;border:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#1B1916;padding:8px 0">Reset</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ summary }}">
+    <aside aria-label="Your KR8A" style="{{ sumSt }}">
+      <button onClick="{{ closeSummary }}" style="background:transparent;border:0;cursor:pointer;font-size:13px;padding:8px 0;text-decoration:underline;text-underline-offset:4px">← Keep designing</button>
+      <h1 style="margin:48px 0 0;font-family:'Libre Caslon Display',serif;font-weight:400;font-size:clamp(52px,6vw,76px);line-height:.98;letter-spacing:-.02em">Your KR8A</h1>
+      <div style="font-family:'Libre Caslon Display',serif;font-size:26px;margin-top:20px;font-variant-numeric:tabular-nums">{{ sizeText }}</div>
+      <div style="font-size:13px;color:#6A6259;margin-top:8px">{{ title }} · {{ date }}</div>
+      <dl style="margin:36px 0 0;display:grid;grid-template-columns:auto 1fr;column-gap:28px">
+        <sc-for list="{{ specRows }}" as="r" hint-placeholder-count="6">
+          <dt style="font-size:13px;color:#6A6259;padding:13px 0;border-top:1px solid rgba(27,25,22,.12)">{{ r.k }}</dt>
+          <dd style="margin:0;font-size:15px;padding:12px 0;border-top:1px solid rgba(27,25,22,.12);text-align:right">{{ r.v }}</dd>
+        </sc-for>
+      </dl>
+      <div style="margin-top:28px;border-top:1px solid rgba(27,25,22,.12);padding-top:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
+        <div><div style="font-family:'Libre Caslon Display',serif;font-size:60px;line-height:1;font-variant-numeric:tabular-nums">{{ priceText }}</div><div style="font-size:13px;color:#6A6259;margin-top:10px">Made to your specification</div></div>
+        <div style="font-size:12px;color:#6A6259;text-align:right;line-height:1.5">Illustrative price<br>for this prototype</div>
+      </div>
+      <button onClick="{{ onContinue }}" style="margin-top:28px;width:100%;height:60px;background:#1B1916;color:#F4F0EA;border:0;font-size:15px;font-weight:500;cursor:pointer">Enquire to order</button>
+      <div style="display:flex;justify-content:space-between;gap:12px;margin-top:6px">
+        <button onClick="{{ onSave }}" style="flex:1;height:48px;background:transparent;border:0;cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:4px">Save design</button>
+        <button onClick="{{ onCopy }}" style="flex:1;height:48px;background:transparent;border:0;cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:4px">Copy link</button>
+        <button onClick="{{ onShare }}" style="flex:1;height:48px;background:transparent;border:0;cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:4px">Share</button>
+      </div>
+      <p style="margin:22px 0 0;font-size:12px;line-height:1.55;color:#6A6259;text-wrap:pretty">Your design is held in a private link. We check every drawing before it is made, and confirm the final specification and price with you.</p>
+    </aside>
+  </sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;frame&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;mobile&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;'auto'|'mobile'&quot;},&quot;idleRotate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showPrice&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  _dockRef = el => { if (this._dro) this._dro.disconnect(); if (!el) return; this._dro = new ResizeObserver(() => { const h = el.offsetHeight; if (h !== this.state.dockH) this.setState({ dockH: h }); }); this._dro.observe(el); };
+  state = { dockH: 0, k: 0, cfg: null, chapter: 'size', sel: 0, view: '34', open: false, dims: false, flash: false, summary: false, shown: null, delta: '', name: '', toast: '', wall: '', wallMm: 0, breathe: 50, fitMsg: '', vw: window.innerWidth, vh: window.innerHeight, focusK: null };
+
+  componentDidMount() {
+    const go = () => {
+      if (!window.KR8A) return (this._wt = setTimeout(go, 40));
+      let c = null; try { c = KR8A.decode(new URLSearchParams(location.search).get('c')); } catch (e) {}
+      this.setState({ k: 1, cfg: c || KR8A.validate(KR8A.DEFAULT).config });
+    };
+    go();
+    this._rs = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight });
+    this._bay = e => { if (this.state.chapter === 'inside' && e.detail.open) this.setState({ sel: e.detail.bay, view: 'bay:' + e.detail.bay }); };
+    window.addEventListener('resize', this._rs); window.addEventListener('kr8a-bay', this._bay);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._rs); window.removeEventListener('kr8a-bay', this._bay); clearTimeout(this._wt); cancelAnimationFrame(this._raf); if (this._dro) this._dro.disconnect(); }
+  componentDidUpdate() {
+    if (!this.state.cfg) return;
+    const target = KR8A.price(this.state.cfg).amount;
+    if (this._target === target) return;
+    const first = this._target == null, from = first ? target : (this.state.shown ?? target), d = first ? 0 : target - this._target;
+    this._target = target;
+    if (from === target) { this.setState({ shown: target }); return; }
+    clearTimeout(this._dt);
+    this.setState({ delta: d ? (d > 0 ? '+' : '−') + KR8A.fmt(Math.abs(d)) : '' });
+    this._dt = setTimeout(() => this.setState({ delta: '' }), 1800);
+    cancelAnimationFrame(this._raf);
+    const t0 = performance.now(), dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 650;
+    const step = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); this.setState({ shown: Math.round(from + (target - from) * e) }); if (k < 1) this._raf = requestAnimationFrame(step); };
+    this._raf = requestAnimationFrame(step);
+  }
+  framed() { return this.props.frame === 'mobile' || location.hash === '#mobile'; }
+  isM() { return this.framed() || this.state.vw < 760; }
+  set(patch) { const r = KR8A.validate(Object.assign({}, this.state.cfg, patch)); const n = r.config.fronts.length; this.setState({ cfg: r.config, sel: Math.min(this.state.sel, n - 1) }); if (r.notes.length) this.toast(r.notes[0]); }
+  toast(t) { clearTimeout(this._tt); this.setState({ toast: t }); this._tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  flash() { clearTimeout(this._ft); if (!this.state.flash) this.setState({ flash: true }); this._ft = setTimeout(() => this.setState({ flash: false }), 1500); }
+  goChapter(id) {
+    const s = this.state;
+    if (!this.isM() && s.chapter === id) return this.setState({ chapter: null, view: '34', open: false });
+    let sel = s.sel;
+    if (id === 'inside' && s.cfg.fronts[sel] === 'R') { const j = s.cfg.fronts.findIndex(f => f !== 'R'); if (j >= 0) sel = j; }
+    const v = { size: '34', fronts: 'front', inside: 'bay:' + sel, finish: 'grain', base: 'base', handles: 'detail' }[id];
+    this.setState({ chapter: id, view: v, sel, open: false, summary: false });
+  }
+  applyWall(g) {
+    const wl = +this.state.wall; if (!wl) return this.toast('Enter your wall width first');
+    const L = KR8A.LIMITS.width, target = Math.floor((wl - 2 * g) / 10) * 10, w = Math.max(L.min, Math.min(L.max, target)), each = Math.round((wl - w) / 2);
+    this.set({ w }); this.flash();
+    this.setState({ wallMm: wl, breathe: g, fitMsg: target > L.max ? `Capped at ${L.max} mm in this prototype. ${each} mm each side.` : target < L.min ? `Narrowest is ${L.min} mm in this prototype.` : `${w} mm, made for your space. ${each} mm each side.` });
+  }
+  link() { return location.origin + location.pathname + '?c=' + KR8A.encode(this.state.cfg); }
+
+  renderVals() {
+    const s = this.state, m = this.isM(), framed = this.framed();
+    const ink = '#1B1916', paper = '#F6F3EE';
+    const outerSt = framed ? { minHeight: '100vh', background: '#DCD5CA', display: 'grid', placeItems: 'center', padding: '40px 0', fontFamily: 'Geist, sans-serif' } : { fontFamily: 'Geist, sans-serif' };
+    const shellSt = framed
+      ? { position: 'relative', width: 390, height: 844, background: '#ECE7DF', overflow: 'hidden', borderRadius: 44, boxShadow: '0 40px 100px rgba(27,25,22,.25), 0 0 0 10px #1B1916', color: ink }
+      : { position: 'relative', width: '100%', height: '100vh', minHeight: m ? 620 : 460, background: '#ECE7DF', overflow: 'hidden', color: ink };
+    if (!s.k || !s.cfg) return { outerSt, shellSt, desk: !m, mob: m };
+    const wide = !m && s.vw >= 1280;
+    const K = KR8A, c = s.cfg, topH = m ? (framed ? 96 : 56) : 0, stageH = m ? '40%' : null, sumW = 500;
+    const ease = 'cubic-bezier(.2,.7,.2,1)';
+    const stageSt = m ? { position: 'absolute', top: topH, left: 0, right: 0, height: stageH } : { position: 'absolute', top: 0, bottom: 0, left: 0, right: s.summary ? sumW : 0, transition: `right .6s ${ease}` };
+    const topSt = m
+      ? { position: 'absolute', top: framed ? 44 : 0, left: 0, right: 0, height: 52, padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 3 }
+      : { position: 'absolute', top: 0, left: 0, right: s.summary ? sumW : 0, padding: '30px 36px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', pointerEvents: 'none', zIndex: 3, transition: `right .6s ${ease}` };
+    const railSt = m
+      ? { position: 'absolute', top: `calc(${topH}px + ${stageH} - 44px)`, left: 20, right: 20, display: 'flex', gap: 14, alignItems: 'center', zIndex: 3, overflowX: 'auto' }
+      : wide ? { position: 'absolute', left: 36, top: 132, display: 'flex', flexDirection: 'column', zIndex: 3 }
+        : { position: 'absolute', left: s.summary ? 36 : '50%', transform: s.summary ? 'none' : 'translateX(-50%)', bottom: s.dockH + 26 + 18, display: 'flex', gap: 22, alignItems: 'center', zIndex: 3, opacity: s.summary ? 0 : 1, pointerEvents: s.summary ? 'none' : 'auto' };
+    const railGapSt = (m || !wide) ? { width: 1, height: 14, background: 'rgba(27,25,22,.2)', flex: '0 0 auto' } : { height: 22 };
+    const dockSt = m
+      ? { position: 'absolute', left: 0, right: 0, bottom: 0, top: `calc(${topH}px + ${stageH})`, display: 'flex', flexDirection: 'column', background: paper, borderRadius: '20px 20px 0 0', boxShadow: '0 -12px 40px rgba(27,25,22,.06)', zIndex: 4 }
+      : { position: 'absolute', bottom: 26, left: s.summary ? `calc((100% - ${sumW}px) / 2)` : '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, zIndex: 4, transition: `left .6s ${ease}, opacity .4s`, opacity: s.summary ? 0 : 1, pointerEvents: s.summary ? 'none' : 'auto' };
+    const traySt = m
+      ? { order: 1, flex: 1, overflowY: 'auto', padding: '20px 20px 24px', animation: 'kr8aIn .35s ease' }
+      : { width: 'min(900px, calc(100vw - 96px))', boxSizing: 'border-box', background: 'rgba(246,243,238,.9)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', padding: '24px 32px 26px', boxShadow: '0 30px 80px rgba(27,25,22,.12)', animation: 'kr8aIn .35s ease', maxHeight: Math.max(150, s.vh - (s.vh >= 780 ? (wide ? 230 : 290) : 520)), overflowY: 'auto' };
+    const navSt = m
+      ? { order: 0, display: 'flex', overflowX: 'auto', padding: '10px 8px 0', borderBottom: '1px solid rgba(27,25,22,.1)', flex: '0 0 auto' }
+      : { display: 'flex', gap: 2, background: 'rgba(246,243,238,.84)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', padding: '4px 6px', boxShadow: '0 20px 50px rgba(27,25,22,.08)' };
+    const toastSt = { position: 'absolute', left: m ? 20 : '50%', right: m ? 20 : 'auto', top: m ? topH + 12 : 34, transform: m ? 'none' : 'translateX(-50%)', background: ink, color: '#F4F0EA', padding: '12px 18px', fontSize: 13, zIndex: 9, animation: 'kr8aIn .3s ease', textAlign: 'center' };
+    const sumSt = m
+      ? { position: 'absolute', inset: 0, top: framed ? 44 : 0, background: paper, padding: '24px 22px 32px', overflowY: 'auto', zIndex: 8, animation: 'kr8aIn .4s ease' }
+      : { position: 'absolute', top: 0, right: 0, bottom: 0, width: sumW, boxSizing: 'border-box', background: paper, padding: '36px 48px 40px', overflowY: 'auto', zIndex: 8, animation: 'kr8aIn .5s ease', boxShadow: '-30px 0 80px rgba(27,25,22,.06)' };
+
+    const L = K.LIMITS;
+    const sl = (key, label, lim) => {
+      const v = c[key], pct = ((v - lim.min) / (lim.max - lim.min)) * 100, foc = s.focusK === key;
+      return {
+        label, caption: key === 'w' ? 'Made to this width' : '', range: `${lim.min}–${lim.max}`, min: lim.min, max: lim.max, step: lim.step, val: v, aria: `${label} in millimetres`,
+        fillSt: { position: 'absolute', left: 0, top: 20, height: 2, width: pct + '%', background: ink, pointerEvents: 'none' },
+        thumbSt: { position: 'absolute', top: 12, left: `calc(${pct}% - 9px)`, width: 18, height: 18, borderRadius: '50%', background: ink, boxShadow: `0 0 0 4px ${paper}${foc ? ', 0 0 0 5.5px ' + ink : ''}`, pointerEvents: 'none', transition: 'box-shadow .2s' },
+        onInput: e => { this.set({ [key]: +e.target.value }); this.flash(); },
+        onFocus: () => this.setState({ focusK: key }), onBlur: () => this.setState({ focusK: null })
+      };
+    };
+    const sliders = [sl('w', 'Width', L.width), sl('h', 'Height', L.height), sl('d', 'Depth', L.depth)];
+    const n = c.fronts.length, opts = K.bayOptions(c.w);
+    const cellsOf = str => str.split('').map(f => ({ isD: f === 'D', isR: f === 'R', isO: f === 'O' }));
+    const bayOpts = L.bays.map(b => ({ label: `${b} bays`, on: b === n, off: !opts.includes(b), reason: K.bayReason(c.w, b), cells: Array.from({ length: b }, () => ({})), go: () => { if (opts.includes(b)) this.set({ fronts: Array(b).fill('D'), inside: Array(b).fill('S'), shelves: Array(b).fill(1) }); } }));
+    const unavailable = L.bays.filter(b => !opts.includes(b));
+    const bayNote = unavailable.length ? `${unavailable.join(' and ')} bays not offered at ${c.w} mm — the doors would fall outside our proportions.` : '';
+    const PN = { DD: 'Two doors', DR: 'Door + drawers', RR: 'All drawers', DO: 'Door + open', DDD: 'Three doors', DRD: 'Centre drawers', RDR: 'Outer drawers', DOD: 'Open centre', DDDD: 'Four doors', DRRD: 'Centre drawers', RDDR: 'Outer drawers', DOOD: 'Open centre' };
+    const drawOK = K.frontAllowed(c, 'R');
+    const patterns = (K.PATTERNS[n] || []).map(p => ({ label: PN[p], on: c.fronts.join('') === p, off: p.includes('R') && !drawOK, cells: cellsOf(p), go: () => { if (!(p.includes('R') && !drawOK)) this.set({ fronts: p.split('') }); } }));
+    const cycle = { D: drawOK ? 'R' : 'O', R: 'O', O: 'D' };
+    const bayCells = c.fronts.map((f, i) => Object.assign(cellsOf(f)[0], { aria: `Bay ${i + 1}: ${K.byId(K.FRONTS, f).name}. Tap to change.`, go: () => { const fr = c.fronts.slice(); fr[i] = cycle[f]; this.set({ fronts: fr }); } }));
+
+    const sel = Math.min(s.sel, n - 1), selF = c.fronts[sel], selIn = c.inside[sel];
+    const insideCells = c.fronts.map((f, i) => ({ sel: i === sel, isR: f === 'R', isS: f !== 'R' && c.inside[i] === 'S', isI: f !== 'R' && c.inside[i] === 'I', isV: f !== 'R' && c.inside[i] === 'V', hasShelf: c.shelves[i] > 0, lines: Array.from({ length: c.shelves[i] }, () => ({})), aria: `Bay ${i + 1}`, go: () => this.setState({ sel: i, view: 'bay:' + i }) }));
+    const iOK = K.carcassHeight(c) >= 420;
+    const insideOpts = K.INSIDES.map(o => ({ name: o.name, note: o.id === 'I' && !iOK ? 'Needs a taller cabinet' : o.note, on: selIn === o.id, off: o.id === 'I' && !iOK, stepper: selIn === o.id && o.id !== 'V', go: () => { if (o.id === 'I' && !iOK) return; const ins = c.inside.slice(); ins[sel] = o.id; const sh = c.shelves.slice(); if (o.id === 'I') sh[sel] = Math.min(sh[sel], 1); if (o.id === 'S' && sh[sel] === 0) sh[sel] = 1; this.set({ inside: ins, shelves: sh }); } }));
+    const maxSh = selIn === 'I' ? 1 : 3;
+    const setSh = v => { const sh = c.shelves.slice(); sh[sel] = Math.max(0, Math.min(maxSh, v)); this.set({ shelves: sh }); };
+    const swSt = (id, size, hRatio) => ({ display: 'block', width: size, height: size * hRatio, backgroundImage: `url(${K.swatch(id)})`, backgroundSize: 'cover', boxShadow: 'inset 0 0 0 1px rgba(27,25,22,.08), 0 1px 2px rgba(27,25,22,.12)' });
+    const finishes = K.FINISHES.map(f => ({ name: f.name, family: f.family, on: c.finish === f.id, imgSt: swSt(f.id, m ? 92 : 116, 1.3), go: () => { this.set({ finish: f.id }); this.setState({ view: 'grain', open: false }); } }));
+    const interiors = K.INTERIORS.map(f => ({ name: f.id === 'mat' ? 'Match' : f.name, on: c.interior === f.id, imgSt: swSt(f.id === 'mat' ? c.finish : f.id, 26, 1), go: () => { this.set({ interior: f.id }); this.setState({ open: true, view: '34' }); } }));
+    const bases = K.BASES.map(b => ({ name: b.name, note: b.note, on: c.base === b.id, isMtl: b.id === 'mtl', isLeg: b.id === 'leg', isPlt: b.id === 'plt', isFlt: b.id === 'flt', go: () => { this.set({ base: b.id }); this.setState({ view: 'base' }); } }));
+    const handles = K.HANDLES.map(b => ({ name: b.name, note: b.note, on: c.handle === b.id, isGrp: b.id === 'grp', isBar: b.id === 'bar', isPsh: b.id === 'psh', go: () => { this.set({ handle: b.id }); this.setState({ view: 'detail', open: false }); } }));
+
+    const CH = [['size', 'Size', 'Set it to the millimetre.'], ['fronts', 'Fronts', 'Doors, drawers and open bays.'], ['inside', 'Inside', 'Fit out each bay. Click any front to open it.'], ['finish', 'Finish', 'Outside and in. Look closely.'], ['base', 'Base', 'How it meets the floor.'], ['handles', 'Handles', 'How the fronts open.']];
+    const cur = CH.find(x => x[0] === s.chapter);
+    const chapters = CH.map((x, i) => ({ num: '0' + (i + 1), label: x[1], on: s.chapter === x[0], off: s.chapter !== x[0], cur: s.chapter === x[0] ? 'step' : undefined, go: () => this.goChapter(x[0]) }));
+    const VW = [['34', '3D'], ['front', 'Front'], ['side', 'Side'], ['detail', 'Detail']];
+    const views = VW.map(([id, label]) => ({ label, on: s.view === id, off: s.view !== id, go: () => this.setState({ view: id }) }));
+    const toggles = [
+      { label: 'Dimensions', on: s.dims, go: () => this.setState({ dims: !s.dims }) },
+      { label: 'Open all', on: s.open, go: () => this.setState({ open: !s.open, view: '34' }) }
+    ];
+    const opened = s.open ? 'all' : s.chapter === 'inside' && !s.summary ? 'bay:' + sel : 'none';
+    const pr = K.price(c), bH = K.byId(K.BASES, c.base).h;
+    const sp = c.sp;
+    return {
+      outerSt, shellSt, stageSt, topSt, railSt, railGapSt, dockSt, traySt, navSt, toastSt, sumSt,
+      dockRef: this._dockRef, pad: String(!m && !s.summary ? s.dockH + 30 + (wide ? 0 : 40) : 0),
+      desk: !m, mob: m, wide, topPad: m ? 0 : 110, showPrice: this.props.showPrice !== false,
+      cfgJson: JSON.stringify(c), view: s.view, opened, dimsS: String(s.dims || s.flash || (s.chapter === 'size' && !s.summary && s.wallMm > 0)), idleS: String(this.props.idleRotate !== false),
+      name: s.name, onName: e => this.setState({ name: e.target.value }),
+      priceText: K.fmt(s.shown ?? pr.amount), delta: s.delta, toast: s.toast, code: K.encode(c),
+      views, toggles, chapters, hasTray: !!cur, chapterTitle: cur ? cur[1] : '', chapterHint: cur ? cur[2] : '',
+      closeTray: () => this.setState({ chapter: null, view: '34', open: false }),
+      isSize: s.chapter === 'size', isFronts: s.chapter === 'fronts', isInside: s.chapter === 'inside', isFinish: s.chapter === 'finish', isBase: s.chapter === 'base', isHandles: s.chapter === 'handles',
+      sizeGridSt: { display: 'grid', gridTemplateColumns: m ? '1fr' : 'repeat(3, minmax(0,1fr))', gap: m ? 14 : 40 },
+      layoutGridSt: { display: 'grid', gridTemplateColumns: m ? '1fr' : 'auto minmax(0,1fr)', gap: m ? 20 : 36 },
+      insideGridSt: { display: 'grid', gridTemplateColumns: m ? '1fr' : 'minmax(0,1.1fr) minmax(0,1fr)', gap: m ? 22 : 40 },
+      sliders, bayOpts, bayNote, patterns, bayCells, frontsText: K.frontsText(c), finishes, bases, handles, interiors,
+      insideCells, insideOpts, selLabel: `Bay ${sel + 1} of ${n}`, selIsR: selF === 'R', selNotR: selF !== 'R', selShelves: c.shelves[sel],
+      shelfMinus: e => { e.stopPropagation(); setSh(c.shelves[sel] - 1); }, shelfPlus: e => { e.stopPropagation(); setSh(c.shelves[sel] + 1); },
+      applyAll: () => { const ins = c.fronts.map((f, i) => f === 'R' ? c.inside[i] : selIn); const sh = c.fronts.map((f, i) => f === 'R' ? 0 : c.shelves[sel]); this.set({ inside: ins, shelves: sh }); this.setState({ open: true, view: '34' }); this.toast('Applied to every door bay'); },
+      goFronts: () => this.goChapter('fronts'),
+      sp, spText: sp === 0 ? 'Even' : sp < 0 ? `Lower ${-sp}%` : `Higher ${sp}%`,
+      spThumbSt: { position: 'absolute', top: 9, left: `calc(${sp + 50}% - 8px)`, width: 16, height: 16, borderRadius: '50%', background: ink, boxShadow: `0 0 0 4px ${paper}`, pointerEvents: 'none' },
+      onSp: e => this.set({ sp: +e.target.value }),
+      lightOn: !!c.light, toggleLight: () => this.set({ light: c.light ? 0 : 1 }),
+      lightKnobSt: { position: 'absolute', top: 2, left: c.light ? 16 : 2, width: 12, height: 12, borderRadius: '50%', background: ink, transition: 'left .25s ease' },
+      wall: s.wall, fitMsg: s.fitMsg || 'Enter the width of your wall or alcove and the sideboard is drawn to fit.', wallMm: s.chapter === 'size' && !s.summary ? s.wallMm : 0,
+      onWall: e => this.setState({ wall: e.target.value.replace(/[^0-9]/g, '') }),
+      onWallKey: e => { if (e.key === 'Enter') this.applyWall(s.breathe); },
+      onFit: () => this.applyWall(s.breathe),
+      wallOpts: [['Tight', 20], ['Balanced', 50], ['Generous', 100]].map(([label, g]) => ({ label, sub: g + ' mm each side', on: s.breathe === g && s.wallMm > 0, go: () => this.applyWall(g) })),
+      finishName: K.byId(K.FINISHES, c.finish).name, finishBlurb: K.byId(K.FINISHES, c.finish).blurb, spinS: String(s.summary), sizeText: `${c.w} × ${c.h} × ${c.d} mm`,
+      reset: () => { this.setState({ cfg: K.validate(K.DEFAULT).config, view: '34', open: false, name: '', fitMsg: '', wall: '', wallMm: 0, sel: 0 }); this.toast('Back to the starting design'); },
+      summary: s.summary,
+      openSummary: () => this.setState({ summary: true, view: '34', open: false, dims: false }),
+      closeSummary: () => this.setState({ summary: false }),
+      title: s.name || `Sideboard, ${c.w}`, date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+      specRows: K.summary(c).slice(1).map(([k, v]) => ({ k, v })),
+      drawSt: { position: 'relative', width: '100%', aspectRatio: `${c.w} / ${c.h}`, maxHeight: 300 },
+      drawBodySt: { position: 'absolute', left: 0, right: 0, top: 0, height: `${((c.h - bH) / c.h) * 100}%`, border: '1.5px solid #1B1916', boxSizing: 'border-box', padding: 4, display: 'flex', gap: 2 },
+      drawBaseSt: { position: 'absolute', left: 0, right: 0, bottom: 0, height: `${(bH / c.h) * 100}%` },
+      drawCells: cellsOf(c.fronts.join('')),
+      bIsMtl: c.base === 'mtl', bIsLeg: c.base === 'leg', bIsPlt: c.base === 'plt', bIsFlt: c.base === 'flt',
+      wText: `${c.w}`, hText: `${c.h}`,
+      onContinue: () => this.toast('Prototype ends here. Next: delivery details and a final check of your drawing.'),
+      onSave: () => { try { const list = JSON.parse(localStorage.getItem('kr8a-saved') || '[]'); list.unshift({ code: K.encode(c), name: s.name, at: Date.now() }); localStorage.setItem('kr8a-saved', JSON.stringify(list.slice(0, 20))); } catch (e) {} this.toast('Saved to this device'); },
+      onCopy: () => { const u = this.link(); (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => this.toast('Link copied'), () => this.toast(u)); },
+      onShare: () => { const u = this.link(); if (navigator.share) navigator.share({ title: 'My KR8A sideboard', url: u }).catch(() => {}); else (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => this.toast('Link copied to share'), () => this.toast(u)); }
+    };
+  }
+}
+</script>
+</body>
+</html>

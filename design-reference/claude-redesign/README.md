@@ -1,13 +1,7 @@
 # Claude Design source
 
-The two supplied `.dc.html` exports are preserved verbatim as visual and interaction references. They are Design Components exports, not standalone production HTML.
+The owner first supplied two standalone `.dc.html` exports, then provided the complete `KR8A Configurator Launch.zip`. Its extracted contents are preserved in `launch-export/kr8a-export/`, including both pages, `kr8a-engine.js`, `kr8a-viewer.js`, `image-slot.js`, `support.js`, the image assets, source README, and eleven desktop/mobile captures. The earlier `.dc.html` files remain as historical references.
 
-The exports reference files that were **not supplied and were not found locally or on the GitHub `main` branch**:
+The export can be viewed by serving its folder with `python3 -m http.server` and opening the HTML pages through localhost. It depends on Google Fonts and Three.js from esm.sh when run directly. The Next.js implementation bundles Three.js locally and uses the supplied engine and viewer through thin adapters. `image-slot.js` and `support.js` are prototype authoring/support utilities, retained here as reference rather than loaded into the customer site.
 
-- `support.js`
-- `kr8a-engine.js`
-- `kr8a-viewer.js`
-- `image-slot.js`
-- `assets/kr8a-hero.png`
-
-The original design prompt also refers to a Claude Design project path at `/projects/019e02c2-92fc-7a76-8b56-7e252bda28f4/`; that path is not present on this machine. The original prototype's pricing formula, full 3D viewer and source hero image could therefore not be imported. The Next.js implementation uses the supplied layouts and copy direction, the recovered React Three Fiber project, and a clearly labelled provisional hero asset.
+The source README explicitly labels pricing, dimensional/structural limits, finishes, hardware and several policy/fulfilment details as placeholders. Its hero and detail images are low-resolution screenshot crops from an existing KR8A site, not original photography. The app displays its price formula only as an illustrative estimate; commercial quoting and manufacturing remain separate work.

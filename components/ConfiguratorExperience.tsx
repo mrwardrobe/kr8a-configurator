@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Sideboard from './Sideboard';
 import ConfiguratorPanel, { Chapter } from './ConfiguratorPanel';
-import { SideboardConfig, decodeConfig, defaultSideboardConfig, designSummary, encodeConfig, normalizeConfig } from '../lib/sideboardEngine';
+import { SideboardConfig, decodeConfig, defaultSideboardConfig, designSummary, encodeConfig, illustrativePrice, normalizeConfig } from '../lib/sideboardEngine';
 import { priceDesign } from '../lib/pricing';
 
 const chapters: { id: Chapter; title: string }[] = [
@@ -24,8 +24,17 @@ export default function ConfiguratorExperience() {
   const [name, setName] = useState('');
   const [toast, setToast] = useState('');
   const [ready, setReady] = useState(false);
-  const [view, setView] = useState<'three-quarter' | 'front' | 'side'>('three-quarter');
+  const [view, setView] = useState<'three-quarter' | 'front' | 'side' | 'detail'>('three-quarter');
+  const [openAll, setOpenAll] = useState(false);
+  const [dimensions, setDimensions] = useState(false);
+  const [stagePad, setStagePad] = useState(0);
   const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
+
+  useEffect(() => {
+    const update = () => setStagePad(window.innerWidth > 900 ? Math.min(430, window.innerHeight * .48) : 0);
+    update(); window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get('c');
@@ -51,6 +60,7 @@ export default function ConfiguratorExperience() {
   };
   const chooseChapter = (next: Chapter) => { setChapter(next); setView(viewFor[next]); setReview(false); };
   const pricing = priceDesign(config);
+  const priceText = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(illustrativePrice(config));
   const link = () => `${window.location.origin}/configurator?c=${encodeConfig(config)}`;
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(link()); setToast('Design link copied.'); }
@@ -74,18 +84,17 @@ export default function ConfiguratorExperience() {
   const reset = () => { setConfig(defaultSideboardConfig); setName(''); setSelectedBay(0); setReview(false); chooseChapter('size'); setToast('Started a new design.'); };
   const loadSaved = (entry: SavedDesign) => { setConfig(normalizeConfig(entry.config)); setName(entry.name); setSelectedBay(0); chooseChapter('size'); setToast('Saved design loaded.'); };
   return <main className="configurator-shell">
-    <div className="config-stage"><Sideboard config={config} view={view} onFrontClick={index => { if (chapter === 'inside') setSelectedBay(index); }} />
-      <header className="config-topbar"><div className="config-identity"><Link href="/" className="brand">KR8A</Link><span className="identity-rule" /><div className="name-field"><span>Sideboard /</span><input aria-label="Name your sideboard" placeholder="Name your piece" value={name} maxLength={42} onChange={event => setName(event.target.value)} /></div></div><div className="config-top-actions"><span>Designed to your dimensions</span><button type="button" onClick={() => setReview(true)} className="button button-ink">Review design ↗</button></div></header>
-      <div className="stage-dimensions"><span>{config.width} <small>W</small></span><i /><span>{config.height} <small>H</small></span><i /><span>{config.depth} <small>D</small></span><em>mm</em></div>
-      <div className="view-options" role="group" aria-label="Camera view">{([['three-quarter', 'Perspective'], ['front', 'Front'], ['side', 'Side']] as const).map(([id, label]) => <button type="button" key={id} aria-pressed={view === id} onClick={() => setView(id)}>{label}</button>)}</div>
+    <div className="config-stage"><Sideboard config={config} view={view} openAll={openAll} dimensions={dimensions} pad={stagePad} top={stagePad ? 80 : 0} onFrontClick={index => { if (chapter === 'inside') setSelectedBay(index); }} />
+      <header className="config-topbar"><div className="config-identity"><Link href="/" className="brand">KR8A</Link><span className="identity-rule" /><div className="name-field"><span>Sideboard /</span><input aria-label="Name your sideboard" placeholder="Name your piece" value={name} maxLength={42} onChange={event => setName(event.target.value)} /></div></div><div className="config-top-actions"><span className="illustrative-top"><strong>{priceText}</strong><small>Illustrative · not a quote</small></span><button type="button" onClick={() => setReview(true)} className="button button-ink">Review design ↗</button></div></header>
+      <div className="view-options" role="group" aria-label="Camera view">{([['three-quarter', '3D'], ['front', 'Front'], ['side', 'Side'], ['detail', 'Detail']] as const).map(([id, label]) => <button type="button" key={id} aria-pressed={view === id} onClick={() => setView(id)}>{label}</button>)}<button type="button" aria-pressed={dimensions} onClick={() => setDimensions(value => !value)}>Dimensions</button><button type="button" aria-pressed={openAll} onClick={() => setOpenAll(value => !value)}>Open all</button></div>
       <div className="stage-hint">Drag to rotate <span>·</span> Scroll to zoom <span>·</span> Click a front to open</div>
     </div>
-    <div className="config-dock"><div className="dock-head"><div><span className="eyebrow">Create your sideboard</span><h1>Every detail, yours.</h1></div><div className="dock-head-right"><span>Price confirmed after design review</span><button className="button button-ink" type="button" onClick={() => setReview(true)}>Review design <span aria-hidden="true">↗</span></button></div></div>
+    <div className="config-dock"><div className="dock-head"><div><span className="eyebrow">Create your sideboard</span><h1>Every detail, yours.</h1></div><div className="dock-head-right"><span>{priceText} illustrative · final price confirmed after review</span><button className="button button-ink" type="button" onClick={() => setReview(true)}>Review design <span aria-hidden="true">↗</span></button></div></div>
       <nav className="chapter-nav" aria-label="Configuration chapters">{chapters.map((item, index) => <button type="button" key={item.id} aria-current={chapter === item.id ? 'step' : undefined} onClick={() => chooseChapter(item.id)}><small>0{index + 1}</small><span>{item.title}</span></button>)}</nav>
       <ConfiguratorPanel config={config} onChange={set} chapter={chapter} selectedBay={selectedBay} onSelectedBay={setSelectedBay} />
       <div className="dock-bottom"><span>Design preview · specifications to be confirmed</span><div><button type="button" onClick={reset}>Reset</button><button type="button" onClick={copyLink}>Copy link ↗</button></div></div>
     </div>
-    {review && <div className="review-shade" onMouseDown={event => { if (event.target === event.currentTarget) setReview(false); }}><aside className="review-panel" aria-label="Your KR8A design" role="dialog" aria-modal="true"><button className="review-back" type="button" onClick={() => setReview(false)}>← Keep designing</button><div className="eyebrow">Your design / {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div><h2>Your KR8A.</h2><p className="review-name">{name.trim() || 'A sideboard made for your space'}</p><div className="review-drawing"><div className="review-drawing-inner">{config.fronts.map((front, index) => <div key={index} className={`review-bay review-bay-${front}`}>{front === 'R' && <><i /><i /></>}{front === 'O' && <i className="review-shelf" />}</div>)}</div><span>{config.width} mm</span></div><dl className="review-spec">{designSummary(config).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl><div className="review-price"><div>{pricing.status === 'unavailable' ? 'Price on enquiry' : new Intl.NumberFormat('en-GB', { style: 'currency', currency: pricing.currency }).format(pricing.amountPence / 100)}</div><p>We will confirm the final specification and price before an order is placed.</p></div><div className="review-actions"><button type="button" className="button button-ink" onClick={copyLink}>Copy design link ↗</button><button type="button" onClick={save}>Save on this device</button><button type="button" onClick={download}>Download design brief</button></div><details className="saved-designs"><summary>Saved designs on this device ({savedDesigns.length})</summary>{savedDesigns.length ? savedDesigns.map((entry, index) => <button type="button" key={`${entry.savedAt}-${index}`} onClick={() => loadSaved(entry)}><strong>{entry.name}</strong><span>{entry.config.width} × {entry.config.height} × {entry.config.depth} mm</span></button>) : <p>No saved designs yet.</p>}</details><p className="review-disclaimer">The dimensions and options shown here are a design preview. Production finishes, tolerances, structural details, pricing and delivery are subject to KR8A review.</p></aside></div>}
+    {review && <div className="review-shade" onMouseDown={event => { if (event.target === event.currentTarget) setReview(false); }}><aside className="review-panel" aria-label="Your KR8A design" role="dialog" aria-modal="true"><button className="review-back" type="button" onClick={() => setReview(false)}>← Keep designing</button><div className="eyebrow">Your design / {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div><h2>Your KR8A.</h2><p className="review-name">{name.trim() || 'A sideboard made for your space'}</p><div className="review-drawing"><div className="review-drawing-inner">{config.fronts.map((front, index) => <div key={index} className={`review-bay review-bay-${front}`}>{front === 'R' && <><i /><i /></>}{front === 'O' && <i className="review-shelf" />}</div>)}</div><span>{config.width} mm</span></div><dl className="review-spec">{designSummary(config).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl><div className="review-price"><div>{pricing.status === 'unavailable' ? priceText : new Intl.NumberFormat('en-GB', { style: 'currency', currency: pricing.currency }).format(pricing.amountPence / 100)}</div><p>{pricing.status === 'unavailable' ? 'Illustrative prototype estimate only. KR8A will confirm the final specification and price before an order is placed.' : 'Final price based on the approved production rate card.'}</p></div><div className="review-actions"><button type="button" className="button button-ink" onClick={copyLink}>Copy design link ↗</button><button type="button" onClick={save}>Save on this device</button><button type="button" onClick={download}>Download design brief</button></div><details className="saved-designs"><summary>Saved designs on this device ({savedDesigns.length})</summary>{savedDesigns.length ? savedDesigns.map((entry, index) => <button type="button" key={`${entry.savedAt}-${index}`} onClick={() => loadSaved(entry)}><strong>{entry.name}</strong><span>{entry.config.width} × {entry.config.height} × {entry.config.depth} mm</span></button>) : <p>No saved designs yet.</p>}</details><p className="review-disclaimer">The dimensions and options shown here are a design preview. Production finishes, tolerances, structural details, pricing and delivery are subject to KR8A review.</p></aside></div>}
     {toast && <div className="toast" role="status">{toast}</div>}
   </main>;
 }

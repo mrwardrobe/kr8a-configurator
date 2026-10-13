@@ -1,126 +1,118 @@
-/** One validated design is shared by the controls, 3D scene, links and review sheet.
- * Dimensions are millimetres throughout. Manufacturing tolerances and commercial
- * prices are deliberately absent until KR8A signs off the construction rules. */
-export const LIMITS = {
-  width: { min: 1200, max: 2400, step: 10 },
-  height: { min: 600, max: 900, step: 10 },
-  depth: { min: 350, max: 600, step: 10 },
-} as const;
+/** Claude's supplied prototype engine is the single source for preview limits,
+ * option data, validation, price illustration, and K3 sharing. None of its
+ * values are approved production or manufacturing rules. */
+import KR8A from './KR8AEngineRuntime.js';
 
-export const PANEL_MM = 18;
-export const REVEAL_MM = 3;
+const source = KR8A as any;
 export type Front = 'D' | 'R' | 'O';
 export type Inside = 'S' | 'I' | 'V';
-export type FinishId = 'oak' | 'walnut' | 'brown-oak' | 'chalk' | 'mushroom' | 'green';
-export type BaseId = 'plinth' | 'timber' | 'metal' | 'floating';
-export type HandleId = 'push' | 'edge' | 'bar';
-
-export const FINISHES: { id: FinishId; name: string; family: string; color: string; grain: boolean }[] = [
-  { id: 'oak', name: 'Natural oak', family: 'Wood', color: '#a78059', grain: true },
-  { id: 'walnut', name: 'Dark walnut', family: 'Wood', color: '#593e2d', grain: true },
-  { id: 'brown-oak', name: 'Brown oak', family: 'Wood', color: '#6d5340', grain: true },
-  { id: 'chalk', name: 'Chalk', family: 'Matte', color: '#d8d1c6', grain: false },
-  { id: 'mushroom', name: 'Mushroom', family: 'Matte', color: '#8d8172', grain: false },
-  { id: 'green', name: 'Deep green', family: 'Matte', color: '#344638', grain: false },
-];
-export const BASES: { id: BaseId; name: string; note: string }[] = [
-  { id: 'plinth', name: 'Recessed plinth', note: 'A quiet, grounded profile' },
-  { id: 'timber', name: 'Timber legs', note: 'Lifts the silhouette' },
-  { id: 'metal', name: 'Slim metal legs', note: 'Light and architectural' },
-  { id: 'floating', name: 'Floating', note: 'Wall fixing to be reviewed' },
-];
-export const HANDLES: { id: HandleId; name: string; note: string }[] = [
-  { id: 'push', name: 'Push to open', note: 'An uninterrupted front' },
-  { id: 'edge', name: 'Edge pull', note: 'A subtle finger grip' },
-  { id: 'bar', name: 'Slim bar', note: 'A precise metal detail' },
-];
-
+export type FinishId = 'oak' | 'smk' | 'wal' | 'blk' | 'wht' | 'grn';
+export type InteriorId = 'mat' | 'wht' | 'blk' | 'grn';
+export type BaseId = 'mtl' | 'leg' | 'plt' | 'flt';
+export type HandleId = 'psh' | 'grp' | 'bar';
 export type SideboardConfig = {
-  version: 1;
+  version: 2;
   width: number;
   height: number;
   depth: number;
   fronts: Front[];
   inside: Inside[];
   shelves: number[];
+  shelfPosition: number;
   finish: FinishId;
-  interior: FinishId | 'match';
+  interior: InteriorId;
   base: BaseId;
   handle: HandleId;
+  light: boolean;
 };
+type FinishOption = { id: FinishId; name: string; family: string; color: string; grain: boolean; note: string };
+type InteriorOption = { id: InteriorId; name: string };
+type BaseOption = { id: BaseId; name: string; note: string; height: number };
+type HandleOption = { id: HandleId; name: string; note: string };
 
+export const LIMITS = { width: source.LIMITS.width, height: source.LIMITS.height, depth: source.LIMITS.depth } as {
+  width: { min: number; max: number; step: number }; height: { min: number; max: number; step: number }; depth: { min: number; max: number; step: number };
+};
+export const PANEL_MM = source.LIMITS.panel as number;
+export const REVEAL_MM = source.LIMITS.gap as number;
+export const FINISHES: FinishOption[] = source.FINISHES.map((f: any) => ({ id: f.id, name: f.name, family: f.family, color: f.base, grain: f.strength > 0, note: f.blurb }));
+export const INTERIORS: InteriorOption[] = source.INTERIORS.map((i: any) => ({ id: i.id, name: i.name }));
+export const BASES: BaseOption[] = source.BASES.map((b: any) => ({ id: b.id, name: b.name, note: b.note, height: b.h }));
+export const HANDLES: HandleOption[] = source.HANDLES.map((h: any) => ({ id: h.id, name: h.name, note: h.note }));
+export const PATTERNS = source.PATTERNS as Record<number, string[]>;
+
+const rawDefault = source.DEFAULT;
 export const defaultSideboardConfig: SideboardConfig = {
-  version: 1, width: 2000, height: 750, depth: 450,
-  fronts: ['D', 'R', 'R', 'D'],
-  inside: ['S', 'S', 'S', 'S'],
-  shelves: [1, 0, 0, 1],
-  finish: 'oak', interior: 'match', base: 'plinth', handle: 'push',
+  version: 2, width: rawDefault.w, height: rawDefault.h, depth: rawDefault.d,
+  fronts: [...rawDefault.fronts], inside: [...rawDefault.inside], shelves: [...rawDefault.shelves],
+  shelfPosition: rawDefault.sp, finish: rawDefault.finish, interior: rawDefault.interior,
+  base: rawDefault.base, handle: rawDefault.handle, light: Boolean(rawDefault.light),
 };
 
-const frontSet = new Set<Front>(['D', 'R', 'O']);
-const insideSet = new Set<Inside>(['S', 'I', 'V']);
-const asRecord = (value: unknown): Record<string, unknown> =>
-  value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
-const choose = <T extends string>(value: unknown, values: readonly T[], fallback: T): T =>
-  values.includes(value as T) ? value as T : fallback;
-const rounded = (value: unknown, min: number, max: number, step: number, fallback: number) => {
-  const n = Number(value);
-  return Number.isFinite(n) ? Math.max(min, Math.min(max, Math.round(n / step) * step)) : fallback;
-};
-export const baseHeight = (base: BaseId) => base === 'floating' ? 150 : base === 'plinth' ? 70 : 130;
-export const carcassHeight = (config: SideboardConfig) => config.height - baseHeight(config.base);
-export const bayWidth = (width: number, count: number) => (width - (count + 1) * PANEL_MM) / count;
-export const bayOptions = (width: number) => [2, 3, 4].filter(n => bayWidth(width, n) >= 350 && bayWidth(width, n) <= 800);
+const asRecord = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+const finishMigration: Record<string, FinishId> = { walnut: 'wal', 'brown-oak': 'smk', chalk: 'wht', mushroom: 'wht', green: 'grn' };
+const interiorMigration: Record<string, InteriorId> = { match: 'mat', oak: 'mat', walnut: 'blk', 'brown-oak': 'blk', chalk: 'wht', mushroom: 'wht', green: 'grn' };
+const baseMigration: Record<string, BaseId> = { plinth: 'plt', timber: 'leg', metal: 'mtl', floating: 'flt' };
+const handleMigration: Record<string, HandleId> = { push: 'psh', edge: 'grp' };
+const migrate = (value: unknown, table: Record<string, string>) => typeof value === 'string' ? table[value] || value : value;
 
 export function normalizeConfig(input: unknown): SideboardConfig {
   const raw = asRecord(input);
-  const width = rounded(raw.width, LIMITS.width.min, LIMITS.width.max, LIMITS.width.step, defaultSideboardConfig.width);
-  const height = rounded(raw.height, LIMITS.height.min, LIMITS.height.max, LIMITS.height.step, defaultSideboardConfig.height);
-  const depth = rounded(raw.depth, LIMITS.depth.min, LIMITS.depth.max, LIMITS.depth.step, defaultSideboardConfig.depth);
-  const offered = bayOptions(width);
-  const requested = Array.isArray(raw.fronts) ? raw.fronts.length : defaultSideboardConfig.fronts.length;
-  const count = offered.includes(requested) ? requested : offered.reduce((best, n) => Math.abs(n - requested) < Math.abs(best - requested) ? n : best, offered[0]);
-  const fronts = Array.from({ length: count }, (_, index): Front => {
-    const value = Array.isArray(raw.fronts) ? raw.fronts[index] : defaultSideboardConfig.fronts[index];
-    if (!frontSet.has(value as Front)) return 'D';
-    return value === 'R' && height < 650 ? 'D' : value as Front;
-  });
-  const inside = Array.from({ length: count }, (_, index): Inside => {
-    const value = Array.isArray(raw.inside) ? raw.inside[index] : 'S';
-    return fronts[index] === 'R' || !insideSet.has(value as Inside) || (value === 'I' && (fronts[index] !== 'D' || height < 690)) ? 'S' : value as Inside;
-  });
-  const shelves = Array.from({ length: count }, (_, index) => fronts[index] === 'R' ? 0 : rounded(Array.isArray(raw.shelves) ? raw.shelves[index] : 1, 0, inside[index] === 'I' ? 1 : 3, 1, 1));
+  const fronts = Array.isArray(raw.fronts) ? raw.fronts.map(value => ['D', 'R', 'O'].includes(value) ? value : 'D') : rawDefault.fronts;
+  const inside = Array.isArray(raw.inside) ? raw.inside.map(value => ['S', 'I', 'V'].includes(value) ? value : 'S') : rawDefault.inside;
+  const shelves = Array.isArray(raw.shelves) ? raw.shelves.map(value => Math.max(0, Math.min(3, Math.round(Number(value) || 0)))) : rawDefault.shelves;
+  const result = source.validate({
+    w: raw.width ?? raw.w ?? rawDefault.w,
+    h: raw.height ?? raw.h ?? rawDefault.h,
+    d: raw.depth ?? raw.d ?? rawDefault.d,
+    fronts, inside, shelves,
+    sp: raw.shelfPosition ?? raw.sp ?? 0,
+    finish: migrate(raw.finish, finishMigration),
+    interior: migrate(raw.interior, interiorMigration),
+    base: migrate(raw.base, baseMigration),
+    handle: migrate(raw.handle, handleMigration),
+    light: raw.light,
+  }).config;
+  // Inner drawers are hidden behind doors; an open bay cannot house this option.
+  result.inside = result.inside.map((value: Inside, index: number) => value === 'I' && result.fronts[index] !== 'D' ? 'S' : value);
+  result.shelves = result.shelves.map((value: number, index: number) => result.inside[index] === 'V' || result.fronts[index] === 'R' ? 0 : value);
   return {
-    version: 1, width, height, depth, fronts, inside, shelves,
-    finish: choose(raw.finish, FINISHES.map(f => f.id), 'oak'),
-    interior: choose(raw.interior, ['match', ...FINISHES.map(f => f.id)] as const, 'match'),
-    base: choose(raw.base, BASES.map(b => b.id), 'plinth'),
-    handle: choose(raw.handle, HANDLES.map(h => h.id), 'push'),
+    version: 2, width: result.w, height: result.h, depth: result.d,
+    fronts: result.fronts, inside: result.inside, shelves: result.shelves,
+    shelfPosition: result.sp, finish: result.finish, interior: result.interior,
+    base: result.base, handle: result.handle, light: Boolean(result.light),
   };
 }
 
-export function encodeConfig(config: SideboardConfig): string {
-  return btoa(JSON.stringify(normalizeConfig(config))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+export function toPrototypeConfig(config: SideboardConfig) {
+  const c = normalizeConfig(config);
+  return { w: c.width, h: c.height, d: c.depth, fronts: c.fronts, inside: c.inside,
+    shelves: c.shelves, sp: c.shelfPosition, finish: c.finish, interior: c.interior,
+    base: c.base, handle: c.handle, light: c.light ? 1 : 0 };
 }
+export const baseHeight = (base: BaseId) => BASES.find(item => item.id === base)?.height ?? 70;
+export const carcassHeight = (config: SideboardConfig) => config.height - baseHeight(config.base);
+export const bayWidth = (width: number, count: number) => (width - 2 * PANEL_MM - REVEAL_MM * (count + 1)) / count;
+export const bayOptions = (width: number): number[] => source.bayOptions(width);
+export const frontAllowed = (config: SideboardConfig, front: Front) => front !== 'R' || (bayWidth(config.width, config.fronts.length) <= source.LIMITS.drawerBayMax && carcassHeight(config) >= source.LIMITS.drawerMinCarcass);
+export const innerDrawersAllowed = (config: SideboardConfig, index: number) => config.fronts[index] === 'D' && carcassHeight(config) >= 420;
+
+export function encodeConfig(config: SideboardConfig): string { return source.encode(toPrototypeConfig(config)); }
 export function decodeConfig(code: string | null): SideboardConfig | null {
-  if (!code || code.length > 3000 || !/^[A-Za-z0-9_-]+$/.test(code)) return null;
+  if (!code || code.length > 3000) return null;
+  if (code.startsWith('K3-')) {
+    if (!/^K3-[A-Za-z0-9-]+$/.test(code)) return null;
+    try { const decoded = source.decode(code); return decoded ? normalizeConfig(decoded) : null; } catch { return null; }
+  }
+  // Keep links created by the previous KR8A preview usable.
+  if (!/^[A-Za-z0-9_-]+$/.test(code)) return null;
   try { return normalizeConfig(JSON.parse(atob(code.replace(/-/g, '+').replace(/_/g, '/')))); }
   catch { return null; }
 }
-export const finishName = (id: FinishId) => FINISHES.find(f => f.id === id)?.name ?? id;
+export const finishName = (id: FinishId) => FINISHES.find(item => item.id === id)?.name ?? id;
 export const frontName = (front: Front) => ({ D: 'Door', R: 'Three drawers', O: 'Open' })[front];
 export const insideName = (inside: Inside) => ({ S: 'Adjustable shelves', I: 'Inner drawers', V: 'Record dividers' })[inside];
-
-/** This is a design summary, not a CNC cut list or a fabrication approval. */
-export function designSummary(config: SideboardConfig) {
-  const c = normalizeConfig(config);
-  return [
-    ['Overall size', `${c.width} × ${c.height} × ${c.depth} mm`],
-    ['Bays', c.fronts.map(frontName).join(' · ')],
-    ['Exterior', finishName(c.finish)],
-    ['Interior', c.interior === 'match' ? 'Match exterior' : finishName(c.interior)],
-    ['Inside', c.fronts.map((front, index) => front === 'R' ? 'Drawer bay' : `${insideName(c.inside[index])}${c.inside[index] === 'S' ? ` (${c.shelves[index]})` : ''}`).join(' · ')],
-    ['Base', BASES.find(item => item.id === c.base)?.name ?? c.base],
-    ['Opening', HANDLES.find(item => item.id === c.handle)?.name ?? c.handle],
-  ] as const;
-}
+export const illustrativePrice = (config: SideboardConfig): number => source.price(toPrototypeConfig(config)).amount;
+/** Customer-facing preview only. Neither this nor componentsPreview is a production specification. */
+export const designSummary = (config: SideboardConfig): [string, string][] => source.summary(toPrototypeConfig(config));
+export const componentsPreview = (config: SideboardConfig) => source.components(toPrototypeConfig(config)) as { part: string; qty: number; l: number; w: number; t: number }[];
