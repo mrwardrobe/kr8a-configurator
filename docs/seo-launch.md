@@ -2,9 +2,9 @@
 
 ## Current state
 
-The public-facing code is a KR8A coming-soon site. The configurator remains an unmodified prototype at `/configurator` with `noindex`. The homepage no longer presents its illustrative price or links customers into an order journey. The form renders disabled and the API returns HTTP 503 until `WAITLIST_ENABLED=true` **and** all required configuration is present. No production deployment, payment or live email send was made by this change.
+The public-facing code is a KR8A coming-soon site for sideboards and bedside tables. The sideboard configurator remains an unmodified prototype at `/configurator` with `noindex`. The homepage does not present its illustrative price or link customers into an order journey. The form renders disabled and the API returns HTTP 503 until `WAITLIST_ENABLED=true` **and** all required configuration is present. No production deployment, payment or live email send was made by these changes.
 
-The hero and detail pictures are low-resolution reference crops from the supplied Claude Design export. Their captions identify them as design-prototype imagery. Obtain approved high-resolution product photography before a full commercial launch.
+The sideboard hero and detail pictures are low-resolution reference crops from the supplied Claude Design export. Their captions identify them as design-prototype imagery. The bedside collection uses the owner-approved image `public/images/kr8a-bedside-concept.png` unchanged; its source SHA-256 is `9f596afede76f26948cb4a677f4c8dcb3333875f50546d78ce55d4e2e49b39ce`. It is labelled as a design concept visualization, not a manufactured-product photograph. Next.js Image serves responsive optimized variants without changing the stored source. Obtain approved high-resolution sideboard photography before a full commercial launch.
 
 ## Early-access design
 
@@ -20,9 +20,11 @@ If Resend responds with an error, the site does not tell the visitor they joined
 
 ## Search and content
 
-Indexable routes have distinct titles, descriptions, canonical URLs and a single H1. The sitemap includes only the homepage, substantive sideboard pages, materials, process, story and journal articles. Contact, privacy, cookies, confirmation pages and the configurator are `noindex` while contact and policy details are being finalized. `robots.txt` leaves the configurator crawlable so its `noindex` can be seen, and excludes the API. A Search Console verification meta tag appears only if `GOOGLE_SITE_VERIFICATION` is configured.
+Indexable routes have distinct titles, descriptions, canonical URLs and a single H1. The sitemap includes only the homepage, substantive sideboard and bedside-table pages, materials, process, story and journal articles. Contact, privacy, cookies, confirmation pages and the configurator are `noindex` while contact and policy details are being finalized. `robots.txt` leaves the configurator crawlable so its `noindex` can be seen, and excludes the API. A Search Console verification meta tag appears only if `GOOGLE_SITE_VERIFICATION` is configured.
 
 The narrow and shallow topics share one page because both are about compact spaces; two-metre proportions are covered on the long-sideboard page. This avoids several near-duplicate pages. The text does not promise a 30 cm depth or final hardware, pricing, delivery or EGGER board SKUs.
+
+The bedside-table collection has one substantial page. The concept depicts one drawer and an open lower compartment; supported dimensions, 18 mm panel engineering, exact finishes, drawer hardware and handles still need production confirmation. There is no floating bedside-table product, so the site does not claim one or create a keyword page for it.
 
 ## Launch sequence
 

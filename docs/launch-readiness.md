@@ -27,4 +27,8 @@ The KR8A pre-launch homepage, collection guides, materials/process/story pages a
 
 The early-access form is coded but intentionally disabled. Resend Contacts is the selected private store, with a dedicated KR8A segment and double opt-in; no Resend API key, verified sending address, segment, Turnstile keys or official contact email is configured in the Vercel project yet. No real submission or email delivery has been tested, so the form must remain off. See `docs/seo-launch.md` for activation requirements.
 
-The editorial SEO audit verifies 14 indexable sitemap entries, distinct titles, canonical paths, one H1 per page and internal links. Contact/legal pages remain noindexed until the official business and privacy details are supplied. Mobile layout was implemented in CSS but not opened in a browser this turn, per the owner's instruction to inspect manually.
+The first editorial SEO audit verified 14 indexable sitemap entries, distinct titles, canonical paths, one H1 per page and internal links. Contact/legal pages remain noindexed until the official business and privacy details are supplied. The bedside collection adds a fifteenth indexable entry. Mobile layout was implemented in CSS; browser inspection is tracked separately.
+
+## Bedside collection update — 26 October 2026
+
+The owner-approved bedroom image is included unchanged as the primary visual for `/bedside-tables` and a homepage feature. The new page describes the image as a design concept visualization and explains dimensions, drawer/open storage, materials and construction without treating a rendering as confirmed production specification. Navigation, footer, materials, journal and sitemap link to the collection. The sideboard configurator remains unchanged. The current collection is a coming-soon concept; no ordering or payment capability was added.

@@ -3,6 +3,7 @@ import { breadcrumbJson } from '../lib/seo';
 
 export const primaryLinks = [
   { href: '/sideboards', label: 'Sideboards' },
+  { href: '/bedside-tables', label: 'Bedside tables' },
   { href: '/materials', label: 'Materials' },
   { href: '/how-it-works', label: 'How it works' },
   { href: '/journal', label: 'Journal' },
@@ -18,9 +19,9 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
 
 export function SiteFooter() {
   return <footer className="editorial-footer">
-    <div><Link href="/" className="brand">KR8A</Link><p>Beautiful furniture. Made to fit your space.</p><small>Our first sideboard collection is in development. Orders are not open.</small></div>
+    <div><Link href="/" className="brand">KR8A</Link><p>Beautiful furniture. Made to fit your space.</p><small>Our sideboard and bedside collections are in development. Orders are not open.</small></div>
     <nav aria-label="Footer navigation">
-      <div><Link href="/sideboards">Sideboards</Link><Link href="/materials">Materials</Link><Link href="/how-it-works">How it works</Link><Link href="/our-story">Our story</Link><Link href="/journal">Journal</Link></div>
+      <div><Link href="/sideboards">Sideboards</Link><Link href="/bedside-tables">Bedside tables</Link><Link href="/materials">Materials</Link><Link href="/how-it-works">How it works</Link><Link href="/our-story">Our story</Link><Link href="/journal">Journal</Link></div>
       <div><Link href="/contact">Contact</Link><Link href="/privacy">Privacy</Link><Link href="/cookies">Cookies</Link></div>
     </nav>
     <small>© {new Date().getFullYear()} KR8A</small>

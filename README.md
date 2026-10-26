@@ -1,6 +1,6 @@
 # KR8A
 
-A pre-launch KR8A sideboard website, built with Next.js 14 and the supplied Claude Design Three.js configurator engine and viewer.
+A pre-launch KR8A furniture website for sideboards and bedside tables, built with Next.js 14 and the supplied Claude Design Three.js sideboard configurator engine and viewer.
 
 ## Run locally
 
@@ -15,7 +15,7 @@ The owner confirmed `kr8a.com` as the public domain. Canonical URLs and the site
 
 ## What is implemented
 
-- An editorial coming-soon homepage, substantial sideboard and materials pages, process and story pages, and five journal articles adapted from the owner's SEO brief. The supplied Claude hero and detail reference crops are retained and labelled as prototype imagery.
+- An editorial coming-soon homepage, substantial sideboard and bedside-table collection pages, materials, process and story pages, and five journal articles adapted from the owner's SEO brief. The supplied Claude sideboard reference crops are retained and labelled as prototype imagery; the owner-approved bedside image is retained unchanged and labelled as a design concept visualization.
 - A gated double-opt-in early-access flow designed around Resend Contacts and Cloudflare Turnstile. It is **inactive** until the owner confirms contact/privacy details and a full delivery-and-storage test passes.
 - A six-stage sideboard configurator: size, fronts, inside, finish, base and handles.
 - The supplied Claude parametric Three.js viewer, including carcass, doors, drawer stacks, internal fittings, procedural wood and base options. Doors and drawers open interactively.

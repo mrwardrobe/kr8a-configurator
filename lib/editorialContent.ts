@@ -120,7 +120,7 @@ export const journalArticles: EditorialEntry[] = [
         'Surface performance and care depend on the specific board and finish. Edges, joints, heat and moisture exposure still need consideration. No single material is universally superior.',
         'For KR8A, the appeal of decorative engineered panels is the possibility of controlled proportions, coherent finishes across doors and carcass, and repeatable components. The final material range and care advice will be published before orders open.',
       ] },
-    ], related: [{ href: '/materials', label: 'Explore our materials approach' }, { href: '/sideboards', label: 'Explore the developing range' }],
+    ], related: [{ href: '/materials', label: 'Explore our materials approach' }, { href: '/sideboards', label: 'Explore sideboards' }, { href: '/bedside-tables', label: 'Explore bedside tables' }],
   },
   {
     slug: 'how-to-measure-for-a-sideboard', title: 'How to measure for a sideboard',

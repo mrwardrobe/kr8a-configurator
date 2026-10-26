@@ -6,7 +6,7 @@ const siteUrl = publicSiteUrl();
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: new URL(siteUrl), alternates: { canonical: `${siteUrl}/` } } : {}),
   title: 'KR8A | Made-to-measure sideboards, coming soon',
-  description: 'Beautiful sideboards designed around your space. Explore considered proportions, flexible storage and premium decorative finishes. Coming soon.',
+  description: 'Beautiful sideboards and bedside tables designed around your space. Explore considered proportions and premium decorative finishes. Coming soon.',
   verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   openGraph: {
     type: 'website', title: 'KR8A | Made-to-measure sideboards, coming soon',
