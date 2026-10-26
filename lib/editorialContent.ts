@@ -95,7 +95,7 @@ export const journalArticles: EditorialEntry[] = [
         'Flat packaging can make long panels easier to move and protect. It may reduce empty transport volume, though that alone does not prove a lower environmental footprint. Materials, packaging, journey distances and longevity all matter.',
         'At KR8A, the intended finished sideboard comes first. We are developing the components and assembly approach to deliver that design; final connections and instructions will be confirmed after prototype testing.',
       ] },
-    ], related: [{ href: '/journal/hidden-furniture-connectors', label: 'The hidden connectors' }, { href: '/how-it-works', label: 'From your space to your sideboard' }],
+    ], related: [{ href: '/journal/modern-flat-pack-precision-connectors', label: 'What makes a flat-pack cabinet feel premium?' }, { href: '/journal/hidden-furniture-connectors', label: 'The hidden connectors' }, { href: '/how-it-works', label: 'From your space to your sideboard' }],
   },
   {
     slug: 'hidden-furniture-connectors', title: 'The hidden connectors behind modern furniture',
@@ -125,7 +125,7 @@ export const journalArticles: EditorialEntry[] = [
         'Surface performance and care depend on the specific board and finish. Edges, joints, heat and moisture exposure still need consideration. No single material is universally superior.',
         'For KR8A, the appeal of decorative engineered panels is the possibility of controlled proportions, coherent finishes across doors and carcass, and repeatable components. The final material range and care advice will be published before orders open.',
       ] },
-    ], related: [{ href: '/materials', label: 'Explore our materials approach' }, { href: '/sideboards', label: 'Explore sideboards' }, { href: '/bedside-tables', label: 'Explore bedside tables' }],
+    ], related: [{ href: '/journal/solid-wood-vs-engineered-board', label: 'A fuller material comparison' }, { href: '/materials', label: 'Explore our materials approach' }, { href: '/sideboards', label: 'Explore sideboards' }, { href: '/bedside-tables', label: 'Explore bedside tables' }],
   },
   {
     slug: 'how-to-measure-for-a-sideboard', title: 'How to measure for a sideboard',
@@ -140,6 +140,6 @@ export const journalArticles: EditorialEntry[] = [
         'Allow space for cupboard doors to swing and drawers to extend. Consider walking routes around a dining table or through a hallway. A cabinet can physically fit and still be awkward to live with.',
         'Do not assume a nominal gap is enough for fitting. Floors, walls and manufactured parts all have tolerances. Confirm the installation allowance and any wall-fixing requirements before ordering.',
       ] },
-    ], related: [{ href: '/sideboards/narrow-and-shallow', label: 'For compact spaces' }, { href: '/how-it-works', label: 'How KR8A will work' }],
+    ], related: [{ href: '/journal/sideboard-size-guide', label: 'Choose the right sideboard dimensions' }, { href: '/sideboards/narrow-and-shallow', label: 'For compact spaces' }, { href: '/how-it-works', label: 'How KR8A will work' }],
   },
 ];
