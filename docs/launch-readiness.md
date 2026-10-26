@@ -20,3 +20,11 @@
 6. **Operations:** Add analytics, error monitoring, accessibility audit on physical devices and cross-browser performance testing once deployment infrastructure is identified.
 
 No production deployment or live payment setting was changed.
+
+## Pre-launch editorial update — 26 October 2026
+
+The KR8A pre-launch homepage, collection guides, materials/process/story pages and five journal articles have been implemented in code. The public homepage now states that orders are not open and no longer displays the prototype price. The configurator files and their geometry/pricing rules were not changed.
+
+The early-access form is coded but intentionally disabled. Resend Contacts is the selected private store, with a dedicated KR8A segment and double opt-in; no Resend API key, verified sending address, segment, Turnstile keys or official contact email is configured in the Vercel project yet. No real submission or email delivery has been tested, so the form must remain off. See `docs/seo-launch.md` for activation requirements.
+
+The editorial SEO audit verifies 14 indexable sitemap entries, distinct titles, canonical paths, one H1 per page and internal links. Contact/legal pages remain noindexed until the official business and privacy details are supplied. Mobile layout was implemented in CSS but not opened in a browser this turn, per the owner's instruction to inspect manually.

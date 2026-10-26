@@ -5,11 +5,12 @@ import './globals.css';
 const siteUrl = publicSiteUrl();
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: new URL(siteUrl), alternates: { canonical: `${siteUrl}/` } } : {}),
-  title: 'KR8A | Sideboards made for your space',
-  description: 'Design a made-to-measure sideboard around your room. Set its dimensions, fronts, interior and finish in the KR8A configurator.',
+  title: 'KR8A | Made-to-measure sideboards, coming soon',
+  description: 'Beautiful sideboards designed around your space. Explore considered proportions, flexible storage and premium decorative finishes. Coming soon.',
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   openGraph: {
-    type: 'website', title: 'KR8A | Sideboards made for your space',
-    description: 'Design a sideboard around your room.',
+    type: 'website', title: 'KR8A | Made-to-measure sideboards, coming soon',
+    description: 'Beautiful furniture. Made to fit your space. The first KR8A sideboard collection is in development.',
     ...(siteUrl ? { url: `${siteUrl}/` } : {}),
   },
 };
