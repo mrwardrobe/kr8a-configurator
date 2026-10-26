@@ -3,6 +3,7 @@ import { journalPack2 } from './journalPack2';
 export type EditorialEntry = {
   slug: string; title: string; description: string; eyebrow: string; intro: string;
   seoTitle?: string;
+  leadParagraphs?: string[];
   sections: { title: string; paragraphs: string[] }[];
   related: { href: string; label: string }[];
   sources?: { href: string; label: string }[];
@@ -61,7 +62,7 @@ export const sideboardPages: EditorialEntry[] = [
       { title: 'A quieter visual rhythm', paragraphs: [
         'Drawer lines can add a precise rhythm to a long cabinet. Keeping the surrounding doors simple lets the detail feel intentional rather than crowded. The right arrangement depends on the overall length and the things you store.',
       ] },
-    ], related: [{ href: '/sideboards/long', label: 'Explore long sideboards' }, { href: '/journal/why-standard-sideboards-dont-fit', label: 'Why standard sizes can miss the mark' }],
+    ], related: [{ href: '/sideboards/long', label: 'Explore long sideboards' }, { href: '/journal/the-art-of-a-silent-drawer', label: 'The art of a silent drawer' }, { href: '/journal/why-standard-sideboards-dont-fit', label: 'Why standard sizes can miss the mark' }],
   },
 ];
 

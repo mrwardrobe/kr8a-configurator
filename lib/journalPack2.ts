@@ -3,6 +3,56 @@ import type { EditorialEntry } from './editorialContent';
 // Source-reviewed editorial copy. Product-specific specifications remain provisional.
 export const journalPack2: EditorialEntry[] = [
   {
+    slug: 'the-art-of-a-silent-drawer',
+    title: 'The Art of a Silent Drawer',
+    seoTitle: 'The Art of a Silent Drawer: Soft-Close Furniture Hardware',
+    description: 'What makes a drawer glide smoothly and close quietly? Explore concealed runners, soft-close damping and the details behind considered furniture.',
+    eyebrow: 'Journal / The details',
+    intro: 'How precision engineering transformed one of furniture’s simplest everyday movements.',
+    leadParagraphs: [
+      'There is a particular satisfaction in opening a beautifully made drawer.',
+      'It moves effortlessly. It feels stable beneath your hand. And when you push it closed, it glides gently into place without a bang.',
+      'It’s a small detail. But it’s one you notice every day.',
+      'At KR8A, we believe the quality of furniture should be experienced as much as admired. That’s why the mechanisms hidden beneath a drawer deserve just as much consideration as the finish on its front.',
+    ],
+    sections: [
+      { title: 'When drawers were simply drawers', paragraphs: [
+        'Traditional wooden drawers often slid against wooden guides. In a well-made piece, that can work beautifully. But wood responds to changes in humidity, and friction between surfaces can make a drawer feel stiff or uneven.',
+        'Metal runners offered another way to support and guide a drawer. Basic roller slides and ball-bearing runners remain common today. Many work well, though simpler systems may provide less adjustment, leave more hardware visible or close without damping.',
+        'The next improvement was not simply making drawers easier to open. It was controlling how they moved.',
+      ] },
+      { title: 'The quiet revolution', paragraphs: [
+        'With a soft-close fitting, a damping mechanism controls the final part of a drawer’s closing movement rather than letting it strike the cabinet unchecked. The result can be a softer, quieter close.',
+        'That difference is especially welcome in a bedroom, where a drawer may be opened early in the morning or late at night. A good drawer should feel composed throughout its movement.',
+      ] },
+      { title: 'What Blum’s MOVENTO illustrates', paragraphs: [
+        'Austrian fittings manufacturer Blum makes concealed drawer runner systems. Its MOVENTO range is a useful example of how far the engineering has progressed: Blum describes synchronised movement and low-friction rollers designed for a smooth glide.',
+        'The runners sit beneath the drawer rather than along its visible sides. MOVENTO systems with BLUMOTION damp the closing movement. The engineering is sophisticated; the experience is intended to feel simple.',
+        'MOVENTO is discussed here as an example, not as a confirmed KR8A component. Our exact runner model and hardware specification remain to be selected and tested before orders open.',
+      ] },
+      { title: 'Precision you can actually feel', paragraphs: [
+        'A carefully chosen decorative finish loses some of its effect if the drawer front sits crooked or its movement feels uneven. Concealed runners can provide adjustment to help a furniture maker align fronts and maintain consistent gaps.',
+        'Blum states that MOVENTO offers four-dimensional adjustment: height, side position, tilt and depth. This matters in contemporary furniture, where narrow, regular gaps are part of the visual design. It also makes fitting and final alignment a deliberate part of assembly, rather than something a photograph can prove.',
+        'Precision is more than a manufacturing specification. It is something you can see and feel.',
+      ] },
+      { title: 'The beauty of what you don’t notice', paragraphs: [
+        'The best furniture hardware often disappears into the experience. You notice that a drawer opens smoothly, closes quietly and feels steady in use; you do not need to see the runners beneath it.',
+        'That is the ambition for KR8A’s made-to-measure [sideboards with drawers](/sideboards/with-drawers) and developing [bedside-table collection](/bedside-tables): considered proportions, [carefully described materials](/materials) and fittings selected for the finished design.',
+        'The specification is still being developed. We will confirm the drawer mechanism, hardware and performance of each product before accepting orders. The smallest movements deserve that care.',
+      ] },
+    ],
+    related: [
+      { href: '/sideboards/with-drawers', label: 'Explore sideboards with drawers' },
+      { href: '/bedside-tables', label: 'The bedside collection' },
+      { href: '/journal/modern-flat-pack-precision-connectors', label: 'More on precision and fittings' },
+    ],
+    sources: [
+      { href: 'https://www.blum.com/gb/en/products/runnersystems/movento/overview/', label: 'Blum UK: MOVENTO overview, glide and BLUMOTION' },
+      { href: 'https://www.blum.com/gb/en/products/runnersystems/movento/assembly/', label: 'Blum UK: MOVENTO four-dimensional adjustment' },
+      { href: 'https://research.fs.usda.gov/fpl/wood-handbook', label: 'US Forest Service: Wood Handbook, wood and moisture' },
+    ],
+  },
+  {
     slug: 'egger-engineered-wood-sustainability',
     title: 'EGGER, engineered wood and sustainability: what buyers should know',
     seoTitle: "EGGER Boards & Sustainability: A Furniture Buyer's Guide",
