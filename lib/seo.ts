@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { publicSiteUrl } from './site';
 
-export function pageMetadata(title: string, description: string, path: string): Metadata {
+export function pageMetadata(title: string, description: string, path: string, openGraphType: 'website' | 'article' = 'website'): Metadata {
   const origin = publicSiteUrl() ?? 'https://kr8a.com';
   const url = new URL(path, origin).toString();
   return {
     title: `${title} | KR8A`,
     description,
     alternates: { canonical: url },
-    openGraph: { type: 'website', title: `${title} | KR8A`, description, url, siteName: 'KR8A' },
+    openGraph: { type: openGraphType, title: `${title} | KR8A`, description, url, siteName: 'KR8A' },
   };
 }
 

@@ -31,6 +31,7 @@ for (const path of htmlPages) {
     titles.set(title, path);
   }
   if (canonical && new URL(canonical).pathname !== path) errors.push(`Canonical mismatch on ${path}: ${canonical}`);
+  if (path.startsWith('/journal/') && !html.includes('"@type":"Article"')) errors.push(`Missing Article structured data on ${path}`);
   for (const match of html.matchAll(/<a[^>]+href="(\/[^"]*)"[^>]*>/g)) {
     const target = new URL(match[1], 'https://kr8a.com').pathname;
     if (target === '/early-access/confirm' || target === '/early-access/confirmed') continue;

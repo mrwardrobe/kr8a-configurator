@@ -26,6 +26,8 @@ The narrow and shallow topics share one page because both are about compact spac
 
 The bedside-table collection has one substantial page. The concept depicts one drawer and an open lower compartment; supported dimensions, 18 mm panel engineering, exact finishes, drawer hardware and handles still need production confirmation. There is no floating bedside-table product, so the site does not claim one or create a keyword page for it.
 
+The second Journal pack adds five substantial, distinct articles covering EGGER material claims, solid timber versus engineered board, choosing sideboard size, shallow storage and precision-built flat-pack furniture. Each article has its own metadata, canonical URL and Article structured data; the sitemap is generated from the same article list. The new articles use typography rather than unapproved photography. The EGGER piece uses its 2025/26 group figure only as a combined recycled-wood-and-sawmill-by-product measure, not as a recycled percentage for any KR8A board. The exact board SKU, chain-of-custody claim, product footprint, hardware and tested assembly details remain unconfirmed. Primary-source links appear alongside the articles where manufacturer or material claims are discussed.
+
 ## Launch sequence
 
 1. Confirm the legal business identity, official contact mailbox, privacy request address, data retention process and final host (`kr8a.com` or `www.kr8a.com`). Review the legal pages with appropriate advice before indexing them.

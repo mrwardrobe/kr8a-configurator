@@ -1,7 +1,11 @@
+import { journalPack2 } from './journalPack2';
+
 export type EditorialEntry = {
   slug: string; title: string; description: string; eyebrow: string; intro: string;
+  seoTitle?: string;
   sections: { title: string; paragraphs: string[] }[];
   related: { href: string; label: string }[];
+  sources?: { href: string; label: string }[];
 };
 
 export const sideboardPages: EditorialEntry[] = [
@@ -62,6 +66,7 @@ export const sideboardPages: EditorialEntry[] = [
 ];
 
 export const journalArticles: EditorialEntry[] = [
+  ...journalPack2,
   {
     slug: 'why-standard-sideboards-dont-fit', title: 'Why the perfect sideboard is so hard to find',
     description: 'Why a beautiful standard-size sideboard can still be wrong for a room, and what to measure before choosing a better fit.',
