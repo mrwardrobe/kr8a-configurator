@@ -32,3 +32,7 @@ The first editorial SEO audit verified 14 indexable sitemap entries, distinct ti
 ## Bedside collection update — 26 October 2026
 
 The owner-approved bedroom image is included unchanged as the primary visual for `/bedside-tables` and a homepage feature. The new page describes the image as a design concept visualization and explains dimensions, drawer/open storage, materials and construction without treating a rendering as confirmed production specification. Navigation, footer, materials, journal and sitemap link to the collection. The sideboard configurator remains unchanged. The current collection is a coming-soon concept; no ordering or payment capability was added.
+
+## Analytics and privacy preparation
+
+See [privacy-analytics-launch.md](privacy-analytics-launch.md) for the authoritative current handover, event contract, test evidence and production activation sequence. The new measurement/consent and secure signup code supersedes older operational notes above. The form and measurement stay off by default; account enablement, credentials, legal review and real delivery/storage tests remain outstanding. No production release was made.

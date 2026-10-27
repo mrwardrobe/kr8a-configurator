@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face{font-family:Geist;font-style:normal;font-weight:300 600;font-display:swap;src:url('/fonts/geist-latin.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 500;font-display:swap;src:url('/fonts/jetbrains-mono-latin.woff2') format('woff2')}
+@font-face{font-family:'Libre Caslon Display';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/libre-caslon-display-latin.woff2') format('woff2')}
+
 :root{--paper:#ece7df;--soft:#f6f3ee;--stone:#e8e0d2;--ink:#1b1916;--muted:#6a6259;--green:#2b3a31;--line:rgba(27,25,22,.16)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -11,6 +15,10 @@ button{cursor:pointer}
 button:disabled{cursor:not-allowed;opacity:.4}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.privacy-launcher{position:fixed;z-index:35;bottom:16px;left:16px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:2px;padding:12px 15px;font-size:11px;box-shadow:0 2px 12px #1b191610;min-height:44px}
+.privacy-banner{position:fixed;z-index:50;bottom:24px;left:24px;right:24px;background:var(--soft);border:1px solid var(--line);box-shadow:0 15px 70px #1b191626;padding:30px;display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center}.privacy-banner h2{font-size:35px;line-height:1.1;margin:10px 0}.privacy-banner p:not(.eyebrow){max-width:660px;font-size:14px;line-height:1.6;margin:0 0 12px}.privacy-banner a{font-size:12px;text-underline-offset:3px}.privacy-actions{display:flex;gap:10px;flex-wrap:wrap}.privacy-actions button{background:var(--soft);color:var(--ink);border:1px solid var(--ink);padding:13px 18px;min-height:46px;font-size:12px;flex:1;white-space:nowrap}.privacy-actions button:hover{background:var(--stone)}
+.privacy-dialog{position:fixed;inset:0;max-height:90svh;max-width:720px;width:calc(100% - 32px);overflow:auto;background:var(--soft);color:var(--ink);padding:36px;border:1px solid var(--line);box-shadow:0 20px 80px #0003}.privacy-dialog::backdrop{background:#14201999}.privacy-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.privacy-dialog-heading button{border:0;background:transparent;font-size:12px;min-height:44px;padding:10px}.privacy-dialog h2{font-size:clamp(40px,5vw,60px);line-height:1;margin:26px 0}.privacy-dialog>p{font-size:14px;line-height:1.65}.privacy-option{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 0;border-top:1px solid var(--line)}.privacy-option h3{font-family:Geist,Arial,sans-serif;font-size:14px;font-weight:500;margin:0 0 8px}.privacy-option p{font-size:13px;line-height:1.6;margin:0;color:#514b43;max-width:450px}.privacy-option>span{font-size:11px;white-space:nowrap}.privacy-option input{accent-color:var(--green);width:24px;height:24px;flex-shrink:0;margin:10px}.privacy-status{background:var(--stone);padding:14px}.privacy-dialog .privacy-detail{font-size:12px;margin:24px 0 0}.privacy-dialog a{text-underline-offset:3px}
+@media(max-width:900px){.privacy-banner{left:16px;right:16px;bottom:16px;grid-template-columns:1fr;gap:20px;padding:24px}.privacy-banner .privacy-actions{display:grid;grid-template-columns:1fr 1fr}.privacy-banner .privacy-actions button:last-child{grid-column:1/-1}.privacy-dialog{padding:24px}.privacy-dialog .privacy-actions{flex-direction:column}.privacy-option{gap:12px}.privacy-launcher{bottom:10px;left:10px}.privacy-dialog h2{max-width:370px}}
 ::selection{background:var(--green);color:#fff}
 .serif,h1,h2,h3,.wall-result{font-family:'Libre Caslon Display',Georgia,serif;font-weight:400}
 .mono,.eyebrow,.panel-section-label,.view-caption,.stage-dimensions,.stage-hint,.dock-bottom,.starter-number,.site-footer small{font-family:'JetBrains Mono',monospace}

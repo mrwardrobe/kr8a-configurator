@@ -12,7 +12,7 @@ test('confirmation token preserves the address and consent version', () => {
   const now = Date.now();
   const token = signConfirmation('person@example.com', now, 'test-secret');
   assert.deepEqual(verifyConfirmation(token, 'test-secret', now + 1000), { email: 'person@example.com', timestamp: now });
-  assert.equal(CONSENT_VERSION, 'kr8a-launch-v1');
+  assert.equal(CONSENT_VERSION, 'kr8a-launch-v2');
 });
 
 test('confirmation fails after tampering or expiry', () => {

@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { publicSiteUrl } from '../lib/site';
+import { publicPaths } from '../lib/publicPaths';
+import { PrivacyControls } from '../components/PrivacyControls';
 import './globals.css';
 
 const siteUrl = publicSiteUrl();
 export const metadata: Metadata = {
+  ...(process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production' ? { robots: { index: false, follow: false } } : {}),
   ...(siteUrl ? { metadataBase: new URL(siteUrl), alternates: { canonical: `${siteUrl}/` } } : {}),
   title: 'KR8A | Made-to-measure sideboards, coming soon',
   description: 'Beautiful sideboards and bedside tables designed around your space. Explore considered proportions and premium decorative finishes. Coming soon.',
@@ -15,9 +18,5 @@ export const metadata: Metadata = {
   },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en-GB"><head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Libre+Caslon+Display&display=swap" rel="stylesheet" />
-  </head><body>{children}</body></html>;
+  return <html lang="en-GB"><body>{children}<PrivacyControls enabled={process.env.ANALYTICS_ENABLED === 'true'} customEvents={process.env.ANALYTICS_CUSTOM_EVENTS_ENABLED === 'true'} environment={process.env.VERCEL_ENV} origin={siteUrl ?? 'https://kr8a.com'} paths={publicPaths} /></body></html>;
 }

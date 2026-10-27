@@ -11,7 +11,10 @@
     "audit:site": "node scripts/audit-site.mjs"
   },
   "dependencies": {
-    "next": "^14.2.18",
+    "@upstash/redis": "^1.40.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "next": "15.5.28",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "three": "^0.170.0"
@@ -22,8 +25,11 @@
     "@types/react-dom": "^18.3.1",
     "@types/three": "^0.170.0",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.32",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.7.2"
+  },
+  "overrides": {
+    "next": { "postcss": "8.5.32" }
   }
 }
