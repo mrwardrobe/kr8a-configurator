@@ -16,6 +16,10 @@ export async function POST(request: NextRequest) {
   } catch { return NextResponse.json({ message: 'Invalid request.' }, { status: 400 }); }
   // Vercel overwrites this header at its edge; never expose the value in events or logs.
   const ip = request.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const result = await requestSignup(data, ip, waitlistDependencies());
-  return NextResponse.json(result, { status: result.status, headers: { 'Cache-Control': 'private, no-store', ...(result.status === 429 ? { 'Retry-After': '900' } : {}) } });
+  try {
+    const result = await requestSignup(data, ip, waitlistDependencies());
+    return NextResponse.json(result, { status: result.status, headers: { 'Cache-Control': 'private, no-store', ...(result.status === 429 ? { 'Retry-After': '900' } : {}) } });
+  } catch {
+    return NextResponse.json({ message: 'The signup service is temporarily unavailable.' }, { status: 503, headers: { 'Cache-Control': 'private, no-store' } });
+  }
 }

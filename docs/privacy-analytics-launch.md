@@ -128,3 +128,11 @@ Review weekly after enough real activity exists. No traffic, ranking, signup or 
 - HTTP-only checks on a loopback build verified 10 rendered routes, privacy/noindex/no-store headers, Vercel-host noindex, rejection of a forged `?status=ok` success display, all three disabled signup APIs, local font delivery and canonical robots. No localhost browser tab was opened.
 - The production dependency advisory audit reports zero known vulnerabilities. Browser bundle inspection found none of the server-secret identifiers.
 - Real Vercel dashboard measurements, provider enablement/entitlement, real mailbox delivery, actual Resend contact storage, live Redis limits, provider unsubscribe delivery and physical-device accessibility remain release checks; they have not been described as completed.
+
+### Preview browser verification
+
+The deployed application at commit `233b614` was inspected in the in-app browser and Chrome. The privacy modal was checked at desktop, 390 × 844 and 320 × 640 viewports. At the two phone widths, page width matched viewport width and the dialog remained within it. Both optional boxes started off. Acceptance persisted, rejection/withdrawal persisted after reload, Shift+Tab stayed inside the modal and Escape returned focus to Privacy choices. Collection navigation worked after rejection. No optional measurement scripts appeared on the preview, including after acceptance.
+
+The configurator still rendered its interactive 3D canvas with no captured console errors, no measurement scripts and no added privacy overlay. This is a focused regression check, not a new validation of production furniture specifications. Desktop and mobile privacy captures are saved under `artifacts/`. Temporary viewport overrides were reset after testing.
+
+The preview build was also rebuilt locally with `VERCEL_ENV=preview`; the preview SEO audit passed, checking noindex metadata on public preview pages and disallow-all preview robots while keeping production canonicals.
