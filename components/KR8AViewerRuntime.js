@@ -1,7 +1,7 @@
 /* <kr8a-viewer> — lazy three.js renderer for a KR8A sideboard config (mm).
    Attrs/props: config (obj|JSON), view ('34'|'front'|'side'|'detail'|'grain'|'base'|'bay:N'),
    opened ('none'|'all'|'bay:N'), dims, idle, pad (px reserved at bottom for UI).
-   Click any front to open/close it. Emits 'ready' and window 'kr8a-bay' {bay}. */
+   Click any front to open/close it. Emits 'ready' and bubbling 'kr8a-bay' {bay}. */
 (function () {
   let libs = null;
   const load = () => libs || (libs = Promise.all([
@@ -321,7 +321,7 @@
       if (u.kind === 'door') this._movers.filter(x => x.userData.inner && x.userData.bay === u.bay).forEach(x => this._setGoal(x.userData, this._st.get(x.userData.key), goal));
       if (u.inner && goal) { const d = this._movers.find(x => x.userData.kind === 'door' && x.userData.bay === u.bay); if (d) { const ds = this._st.get(d.userData.key); if (!ds.goal) { this._setGoal(d.userData, ds, 1); st.delay = 24; } } }
       this._poke();
-      window.dispatchEvent(new CustomEvent('kr8a-bay', { detail: { bay: u.bay, open: !!goal } }));
+      this.dispatchEvent(new CustomEvent('kr8a-bay', { bubbles: true, detail: { bay: u.bay, open: !!goal } }));
     }
     _step() {
       let moving = false;

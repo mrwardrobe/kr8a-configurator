@@ -35,7 +35,7 @@ export const LIMITS = { width: source.LIMITS.width, height: source.LIMITS.height
 };
 export const PANEL_MM = source.LIMITS.panel as number;
 export const REVEAL_MM = source.LIMITS.gap as number;
-export const FINISHES: FinishOption[] = source.FINISHES.map((f: any) => ({ id: f.id, name: f.name, family: f.family, color: f.base, grain: f.strength > 0, note: f.blurb }));
+export const FINISHES: FinishOption[] = source.FINISHES.map((f: any) => ({ id: f.id, name: f.name, family: f.strength > 0 ? 'Wood effect' : 'Solid colour', color: f.base, grain: f.strength > 0, note: 'Decorative board finish exploration; production code and sample to be confirmed.' }));
 export const INTERIORS: InteriorOption[] = source.INTERIORS.map((i: any) => ({ id: i.id, name: i.name }));
 export const BASES: BaseOption[] = source.BASES.map((b: any) => ({ id: b.id, name: b.name, note: b.note, height: b.h }));
 export const HANDLES: HandleOption[] = source.HANDLES.map((h: any) => ({ id: h.id, name: h.name, note: h.note }));
@@ -101,12 +101,16 @@ export function encodeConfig(config: SideboardConfig): string { return source.en
 export function decodeConfig(code: string | null): SideboardConfig | null {
   if (!code || code.length > 3000) return null;
   if (code.startsWith('K3-')) {
-    if (!/^K3-[A-Za-z0-9-]+$/.test(code)) return null;
+    if (!/^K3-[A-Za-z0-9.-]+$/.test(code)) return null;
     try { const decoded = source.decode(code); return decoded ? normalizeConfig(decoded) : null; } catch { return null; }
   }
   // Keep links created by the previous KR8A preview usable.
   if (!/^[A-Za-z0-9_-]+$/.test(code)) return null;
-  try { return normalizeConfig(JSON.parse(atob(code.replace(/-/g, '+').replace(/_/g, '/')))); }
+  try {
+    const raw = asRecord(JSON.parse(atob(code.replace(/-/g, '+').replace(/_/g, '/'))));
+    if (![raw.width ?? raw.w, raw.height ?? raw.h, raw.depth ?? raw.d].every(value => typeof value === 'number' && Number.isFinite(value)) || !Array.isArray(raw.fronts)) return null;
+    return normalizeConfig(raw);
+  }
   catch { return null; }
 }
 export const finishName = (id: FinishId) => FINISHES.find(item => item.id === id)?.name ?? id;
@@ -114,5 +118,5 @@ export const frontName = (front: Front) => ({ D: 'Door', R: 'Three drawers', O: 
 export const insideName = (inside: Inside) => ({ S: 'Adjustable shelves', I: 'Inner drawers', V: 'Record dividers' })[inside];
 export const illustrativePrice = (config: SideboardConfig): number => source.price(toPrototypeConfig(config)).amount;
 /** Customer-facing preview only. Neither this nor componentsPreview is a production specification. */
-export const designSummary = (config: SideboardConfig): [string, string][] => source.summary(toPrototypeConfig(config));
+export const designSummary = (config: SideboardConfig): [string, string][] => source.summary(toPrototypeConfig(config)).map(([key, value]: [string, string]) => [key, key === 'Hardware' ? 'Proposed soft-close fittings; model to be confirmed' : value]);
 export const componentsPreview = (config: SideboardConfig) => source.components(toPrototypeConfig(config)) as { part: string; qty: number; l: number; w: number; t: number }[];

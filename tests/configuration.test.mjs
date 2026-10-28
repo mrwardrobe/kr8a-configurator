@@ -9,6 +9,26 @@ test('shared URL retains a fully specified design', () => {
   assert.equal(decodeConfig('not-json'), null);
 });
 
+test('shared designs retain every shelf offset and base without changing price or summary', () => {
+  for (const base of BASES) {
+    for (let shelfPosition = -50; shelfPosition <= 50; shelfPosition += 10) {
+      const design = normalizeConfig({ ...defaultSideboardConfig, base: base.id, shelfPosition, width: 1800, fronts: ['D', 'R', 'O'], inside: ['I', 'S', 'S'], shelves: [1, 0, 3], light: true });
+      const reopened = decodeConfig(encodeConfig(design));
+      assert.deepEqual(reopened, design);
+      assert.deepEqual(designSummary(reopened), designSummary(design));
+      assert.equal(illustrativePrice(reopened), illustrativePrice(design));
+    }
+  }
+});
+
+test('malformed design links are rejected rather than silently becoming a default design', () => {
+  const valid = encodeConfig(defaultSideboardConfig);
+  for (const invalid of [valid.replace('DDDD', 'XXXX'), valid.replace('SSSS', 'SS'), valid.replace('1111', '9999'), valid.replace('2000', 'oops'), valid.replace('oak', 'imaginary'), Buffer.from('{}').toString('base64url'), Buffer.from('null').toString('base64url'), Buffer.from('[]').toString('base64url')]) {
+    assert.equal(decodeConfig(invalid), null, invalid);
+  }
+  assert.deepEqual(decodeConfig(Buffer.from(JSON.stringify(defaultSideboardConfig)).toString('base64url')), defaultSideboardConfig);
+});
+
 test('every offered bay count stays inside the declared prototype proportions', () => {
   for (let width = LIMITS.width.min; width <= LIMITS.width.max; width += LIMITS.width.step) {
     const options = bayOptions(width);

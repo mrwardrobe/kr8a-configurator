@@ -3,22 +3,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { SideboardConfig, toPrototypeConfig } from '../lib/sideboardEngine';
 
-type View = 'three-quarter' | 'front' | 'side' | 'detail';
+export type SideboardView = 'three-quarter' | 'front' | 'side' | 'detail' | 'grain' | 'base' | `bay:${number}`;
 type ViewerElement = HTMLElement & {
   config: object; view: string; opened: string; dims: boolean; styled: boolean;
   wall: number; idle: boolean; spin: boolean; pad: number; top: number;
 };
 type Props = {
-  config: SideboardConfig; view?: View; onFrontClick?: (index: number) => void;
+  config: SideboardConfig; view?: SideboardView; onFrontClick?: (index: number) => void;
   className?: string; openAll?: boolean; dimensions?: boolean; styled?: boolean;
-  wall?: number; idle?: boolean; spin?: boolean; pad?: number; top?: number;
+  wall?: number; idle?: boolean; spin?: boolean; pad?: number; top?: number; openBay?: number;
 };
 const viewId = { 'three-quarter': '34', front: 'front', side: 'side', detail: 'detail' } as const;
 
 /** Adapter around the supplied Claude Design viewer. Its Three.js modules are
  * bundled from this project instead of fetched from esm.sh at runtime. */
 export default function Sideboard({ config, view = 'three-quarter', onFrontClick, className = '', openAll = false,
-  dimensions = false, styled = true, wall = 0, idle = true, spin = false, pad = 0, top = 0 }: Props) {
+  dimensions = false, styled = true, wall = 0, idle = true, spin = false, pad = 0, top = 0, openBay }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const element = useRef<ViewerElement | null>(null);
   const [ready, setReady] = useState(false);
@@ -37,11 +37,14 @@ export default function Sideboard({ config, view = 'three-quarter', onFrontClick
   }, []);
 
   useEffect(() => {
+    if (ready && element.current) element.current.config = toPrototypeConfig(config);
+  }, [config, ready]);
+
+  useEffect(() => {
     const viewer = element.current;
     if (!viewer || !ready) return;
-    viewer.config = toPrototypeConfig(config);
-    viewer.view = viewId[view];
-    viewer.opened = openAll ? 'all' : 'none';
+    viewer.view = view in viewId ? viewId[view as keyof typeof viewId] : view;
+    viewer.opened = openAll ? 'all' : openBay === undefined ? 'none' : `bay:${openBay}`;
     viewer.dims = dimensions;
     viewer.styled = styled;
     viewer.wall = wall;
@@ -49,14 +52,15 @@ export default function Sideboard({ config, view = 'three-quarter', onFrontClick
     viewer.spin = spin;
     viewer.pad = pad;
     viewer.top = top;
-  }, [config, view, openAll, dimensions, styled, wall, idle, spin, pad, top, ready]);
+  }, [view, openAll, openBay, dimensions, styled, wall, idle, spin, pad, top, ready]);
 
   useEffect(() => {
-    if (!onFrontClick) return;
+    const viewer = element.current;
+    if (!viewer || !ready || !onFrontClick) return;
     const handler = (event: Event) => onFrontClick((event as CustomEvent<{ bay: number }>).detail.bay);
-    window.addEventListener('kr8a-bay', handler);
-    return () => window.removeEventListener('kr8a-bay', handler);
-  }, [onFrontClick]);
+    viewer.addEventListener('kr8a-bay', handler);
+    return () => viewer.removeEventListener('kr8a-bay', handler);
+  }, [onFrontClick, ready]);
 
   return <div ref={root} className={`viewer ${className}`} aria-label="Interactive 3D sideboard. Drag to rotate; click doors or drawers to open them.">{error && <p role="alert">The 3D view could not load. Your design choices are still saved.</p>}</div>;
 }
