@@ -1,5 +1,7 @@
 # Launch readiness — 13 October 2026
 
+For the current configurator state and preview verification, see [configurator-readiness.md](configurator-readiness.md), updated 28 October 2026. Older status entries below are historical.
+
 ## Working and verified locally
 
 - Homepage, configurator and 404 page respond successfully; the production build completes.
