@@ -53,3 +53,18 @@ Local storage belongs to a specific browser and origin. A new unique preview URL
 A production-build HTTP check returned 404, `X-Robots-Tag: noindex` and private/no-store for the owner route. The response contained no owner workspace content; the public sitemap contained no owner route.
 
 Preview browser verification is recorded below after testing. No production deployment or supplier order is authorized by this document.
+
+### Browser verification — 28 October 2026
+
+Tested feature preview commit: `156c5ae`, following implementation commit `7adfd19`. Vercel deployment `dpl_E2fUB3i6SNVvKAWhRUtVt3LK63r5` is READY with no production target.
+
+- Created an explicitly labelled QA project with three furniture units, a 1000 × 500 × 18 mm panel at two per unit and a connector at four per unit.
+- Entered grain, four edge specifications, machining and reviewer details, completed the fixture's review, and downloaded the reviewed CSV and workspace backup. Read both files from disk: the CSV has aligned columns, six panels, twelve connectors, correct dimensions, material/edge codes and reviewer attribution; the JSON has the matching project. No real supplier confirmation or order was implied by this test fixture.
+- Edited the panel width to 450 mm: the panel check and project checks cleared, reviewed export disabled, net area changed to 2.700 m² and specified edge length to 8.70 m.
+- Imported the supplied K3 default design with a −40% shelf offset: six provisional carcass rows appeared, the source code was retained, missing fronts/base/drawer/hardware information was displayed, and reviewed export remained disabled.
+- Reloaded the browser: both projects and their specifications recovered, with fresh review required.
+- Inspected desktop at 1440 × 1000 and phones at 390 × 844 and 320 × 740. Corrected an absolutely positioned table-label overflow; the final document widths match 390 and 320 px. The wide table scrolls within its own region. A panel can be opened on a phone by tapping its part name.
+- No browser errors/warnings or analytics/performance scripts were captured. Private-route privacy controls are also excluded.
+- Screenshots: `artifacts/owner-cutting-list-desktop.png` and `artifacts/owner-cutting-list-mobile.png`.
+
+The browser backup download and parser round-trip are verified; the operating-system restore file-picker flow has not been independently exercised. No real supplier upload, cutting job, CNC file, production owner login or cloud persistence has been tested or enabled.
