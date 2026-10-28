@@ -15,6 +15,7 @@ const nextConfig = {
       { source: '/:path*', has: [{ type: 'host', value: '.*\\.vercel\\.app' }], headers: [noindex] },
       { source: '/early-access/:path*', headers: [noindex, { key: 'Cache-Control', value: 'private, no-store' }] },
       { source: '/api/:path*', headers: [noindex, { key: 'Cache-Control', value: 'private, no-store' }] },
+      { source: '/owner/:path*', headers: [noindex, { key: 'Cache-Control', value: 'private, no-store' }] },
       { source: '/fonts/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },
     ];
   },
