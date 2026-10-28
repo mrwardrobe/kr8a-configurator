@@ -89,7 +89,7 @@ export function PrivacyControls({ enabled, customEvents, environment, origin, pa
   }
   function manage() { setAnalytics(choice?.analytics ?? false); setPerformance(choice?.performance ?? false); dialog.current?.showModal(); }
   const publicPage = paths.includes(pathname);
-  if (pathname === '/configurator') return null;
+  if (pathname === '/configurator' || pathname === '/owner' || pathname.startsWith('/owner/')) return null;
   return <>
     {ready && eligible && (publicPage || pathname === '/early-access/confirm') && !choice && <section className="privacy-banner" aria-labelledby="privacy-banner-title">
       <div><p className="eyebrow">Your privacy</p><h2 id="privacy-banner-title">A considered visit.</h2><p>With your permission, Vercel helps us understand collection interest and page performance. Optional measurement starts only if you accept. You can change your choice at any time.</p><Link href="/cookies">How we use browser storage</Link></div>

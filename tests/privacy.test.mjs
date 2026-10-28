@@ -56,6 +56,7 @@ test('private pages and configuration stay unmeasured; only a confirmed event ca
   assert.equal(filterMeasurementEvent({ ...event, type: 'pageview' }, { ...state, confirmedEvent: true }), null);
   assert.equal(filterMeasurementEvent({ ...event, type: 'vital' }, { ...state, kind: 'performance', confirmedEvent: true }), null);
   assert.equal(filterMeasurementEvent(event, { ...state, currentPath: '/configurator', confirmedEvent: true }), null);
+  assert.equal(filterMeasurementEvent(event, { ...state, currentPath: '/owner/cutting-lists', confirmedEvent: true }), null);
   assert.equal(filterMeasurementEvent({ ...event, url: 'https://other.test/' }, { ...state, confirmedEvent: true }), null);
 });
 
