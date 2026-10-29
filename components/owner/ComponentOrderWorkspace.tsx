@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { approveOrder, designFromInput, hardwareIssues, isReviewed, materialTotals, MAX_HARDWARE, MAX_PANELS, newHardware, newOrderJob, newPanel, ORDER_STORAGE_KEY, orderCsv, orderIssues, panelIssues, parseOrderBackup, REVIEW_ITEMS, reviseJob, seedFromDesign, workspaceBackup, type HardwarePart, type OrderJob, type PanelPart } from '../../lib/componentOrders';
 import PartSketch from './PartSketch';
+import CustomerOrderQueue from './CustomerOrderQueue';
 
 const uid = () => crypto.randomUUID();
 const numeric = (value: string) => Number.isFinite(Number(value)) ? Number(value) : 0;
@@ -55,6 +56,10 @@ export default function ComponentOrderWorkspace() {
     if (jobs.length >= 30) { setNotice('The workspace holds up to 30 projects. Export a backup before starting a separate workspace.'); return; }
     skipPersist.current = false; setJobs(current => [next, ...current]); setActive(next.id); setSelected(next.panels[0]?.id ?? ''); setNotice('New project created.');
   };
+  const openCustomerOrder = (next: OrderJob) => {
+    if (jobs.some(j => j.id === next.id)) { setActive(next.id); setSelected(''); return; }
+    addJob(structuredClone(next));
+  };
   const patchPanel = (patch: Partial<PanelPart>) => { if (job && part) change({ panels: job.panels.map(p => p.id === part.id ? { ...p, ...patch, verified: 'verified' in patch ? Boolean(patch.verified) : false } : p) }); };
   const patchHardware = (patch: Partial<HardwarePart>) => { if (job && hardware) change({ hardware: job.hardware.map(p => p.id === hardware.id ? { ...p, ...patch, verified: 'verified' in patch ? Boolean(patch.verified) : false } : p) }); };
   const importDesign = (value = designInput) => {
@@ -95,6 +100,8 @@ export default function ComponentOrderWorkspace() {
     <header className="owner-header"><Link className="brand" href="/">KR8A</Link><span className="owner-badge">Owner workspace / Preview</span><div><button type="button" onClick={() => download('kr8a-component-workspace.json', workspaceBackup(jobs), 'application/json')}>Download backup</button><button type="button" onClick={() => backupUpload.current?.click()}>Restore backup</button></div></header>
     <div className="owner-intro"><div><p className="eyebrow">From design to workshop</p><h1>Every component, considered.</h1><p>Prepare, check and export the parts you need to order.</p></div><p className="owner-storage" role="status">{saved ? 'Saved in this browser only' : 'Device saving unavailable — download a backup'}<small>No supplier orders are sent. This preview is not enabled on the live website.</small></p></div>
     <div className="owner-notice" role="status">{notice || 'Work in finished panel sizes, in millimetres. Confirm edging allowances and machining with your supplier. Imported designs are incomplete prototype starting points.'}</div>
+    <CustomerOrderQueue onOpen={openCustomerOrder} />
+    {job.customerOrder && <section className="owner-order-hold" aria-label="Customer order engineering hold"><strong>Customer order {job.customerOrder.orderId} · Engineering hold</strong><p>This draft was created automatically from the confirmed configuration and quantity. Approved manufacturing rules are missing, so workshop release is blocked. Do not order from its prototype panels.</p><small>Design {job.customerOrder.designCode} · Price rules {job.customerOrder.pricingRulesVersion} · {job.customerOrder.mode.toUpperCase()}</small></section>}
     {importError && <p className="owner-error" role="alert">{importError}</p>}
     <input ref={upload} type="file" accept=".json,application/json" className="owner-file-input" aria-label="Import design brief file" onChange={e => { void fileInput(e.target.files?.[0], false); e.target.value = ''; }} />
     <input ref={backupUpload} type="file" accept=".json,application/json" className="owner-file-input" aria-label="Restore workspace backup file" onChange={e => { void fileInput(e.target.files?.[0], true); e.target.value = ''; }} />

@@ -14,11 +14,13 @@ export const REVIEW_ITEMS = [
   { id: 'supplier', label: 'The supplier has confirmed finished-size conventions, machining and any edging allowances.' },
 ] as const;
 export type ReviewKey = typeof REVIEW_ITEMS[number]['id'];
+export type CustomerOrderLink = { orderId: string; paymentReference: string; pricingRulesVersion: string; confirmedAt: string; designCode: string; mode: 'test' | 'live'; engineeringHold: true };
 export type OrderJob = {
   version: 1; id: string; title: string; reference: string; supplier: string; units: number; revision: number;
   notes: string; reviewer: string; panels: PanelPart[]; hardware: HardwarePart[];
   source: { kind: 'manual' | 'prototype'; code: string; note: string };
   checks: Record<ReviewKey, boolean>; approval: null | { revision: number; reviewer: string; at: string };
+  customerOrder?: CustomerOrderLink;
 };
 export const ORDER_STORAGE_KEY = 'kr8a-owner-component-orders-v1';
 export const MAX_PANELS = 250;
@@ -48,6 +50,7 @@ export function hardwareIssues(part: HardwarePart): string[] {
 }
 export function orderIssues(job: OrderJob): string[] {
   const issues: string[] = [];
+  if (job.customerOrder) issues.push('Engineering hold: this confirmed order needs approved manufacturing rules before any supplier release.');
   if (!job.title.trim()) issues.push('Add a project name.');
   if (!job.reference.trim()) issues.push('Add an order reference.');
   if (!job.supplier.trim()) issues.push('Add the supplier name.');
@@ -108,7 +111,13 @@ export function parseOrderBackup(input: string): OrderJob[] {
     });
     const hardware = raw.hardware.map((value: unknown) => { if (!isRecord(value)) throw new Error('Invalid hardware.'); return { ...newHardware(rowId(value.id)), label: textValue(value.label), code: textValue(value.code), quantity: numberValue(value.quantity), notes: textValue(value.notes, 2000), verified: false }; });
     const source = isRecord(raw.source) && raw.source.kind === 'prototype' ? { kind: 'prototype' as const, code: textValue(raw.source.code, 3000), note: textValue(raw.source.note, 2000) } : job.source;
-    return { ...job, title: textValue(raw.title), reference: textValue(raw.reference), supplier: textValue(raw.supplier), reviewer: textValue(raw.reviewer), units: numberValue(raw.units), notes: textValue(raw.notes, 4000), revision: whole(numberValue(raw.revision), 1_000_000) ? Number(raw.revision) + 1 : 1, panels, hardware, source };
+    let customerOrder: CustomerOrderLink | undefined;
+    if (raw.customerOrder !== undefined) {
+      const origin = raw.customerOrder;
+      if (!isRecord(origin) || !textValue(origin.orderId) || !textValue(origin.paymentReference) || !textValue(origin.pricingRulesVersion) || !Number.isFinite(Date.parse(String(origin.confirmedAt))) || !decodeConfig(textValue(origin.designCode, 3000)) || !['test', 'live'].includes(String(origin.mode))) throw new Error('Invalid customer order reference.');
+      customerOrder = { orderId: textValue(origin.orderId), paymentReference: textValue(origin.paymentReference), pricingRulesVersion: textValue(origin.pricingRulesVersion), confirmedAt: textValue(origin.confirmedAt), designCode: textValue(origin.designCode, 3000), mode: origin.mode as 'test' | 'live', engineeringHold: true };
+    }
+    return { ...job, title: textValue(raw.title), reference: textValue(raw.reference), supplier: textValue(raw.supplier), reviewer: textValue(raw.reviewer), units: numberValue(raw.units), notes: textValue(raw.notes, 4000), revision: whole(numberValue(raw.revision), 1_000_000) ? Number(raw.revision) + 1 : 1, panels, hardware, source, ...(customerOrder ? { customerOrder } : {}) };
   });
 }
 export const workspaceBackup = (jobs: OrderJob[]) => JSON.stringify({ document: 'KR8A component workspace', version: 1, jobs }, null, 2);
@@ -136,9 +145,9 @@ const csvCell = (value: unknown) => {
 export function orderCsv(job: OrderJob, reviewed = false): string {
   if (reviewed && !isReviewed(job)) throw new Error('Review this revision before exporting an order sheet.');
   const status = reviewed ? 'OWNER REVIEWED — supplier confirmation required' : 'DRAFT — DO NOT ORDER';
-  const header = ['Status', 'Reference', 'Revision', 'Supplier', 'Project', 'Furniture quantity', 'Line', 'Type', 'Part', 'Qty per unit', 'Total qty', 'Finished length mm', 'Finished width mm', 'Thickness mm', 'Material / supplier code', 'Grain direction', 'Edge L1', 'Edge L2', 'Edge W1', 'Edge W2', 'Machining / notes', 'Reviewed by', 'Reviewed at', 'Source design', 'Order notes', 'Dimension basis'];
+  const header = ['Status', 'Reference', 'Revision', 'Supplier', 'Project', 'Furniture quantity', 'Line', 'Type', 'Part', 'Qty per unit', 'Total qty', 'Finished length mm', 'Finished width mm', 'Thickness mm', 'Material / supplier code', 'Grain direction', 'Edge L1', 'Edge L2', 'Edge W1', 'Edge W2', 'Machining / notes', 'Reviewed by', 'Reviewed at', 'Source design', 'Order notes', 'Dimension basis', 'Customer order', 'Pricing rules', 'Manufacturing state'];
   const prefix = [status, job.reference, job.revision, job.supplier, job.title, job.units];
-  const suffix = [reviewed ? job.approval?.reviewer : '', reviewed ? job.approval?.at : '', job.source.code, job.notes, 'FINISHED PANEL SIZES — supplier to confirm edging allowances; no CNC data'];
+  const suffix = [reviewed ? job.approval?.reviewer : '', reviewed ? job.approval?.at : '', job.source.code, job.notes, 'FINISHED PANEL SIZES — supplier to confirm edging allowances; no CNC data', job.customerOrder?.orderId || '', job.customerOrder?.pricingRulesVersion || '', job.customerOrder ? 'ENGINEERING HOLD — DO NOT MANUFACTURE' : 'Owner-specified components'];
   const rows: unknown[][] = [header,
     ...job.panels.map((p, i) => [...prefix, `P${String(i + 1).padStart(3, '0')}`, 'Panel', p.label, p.quantity, p.quantity * job.units, p.length, p.width, p.thickness, p.material, p.grain, p.edges.length1, p.edges.length2, p.edges.width1, p.edges.width2, p.machining, ...suffix]),
     ...job.hardware.map((p, i) => [...prefix, `H${String(i + 1).padStart(3, '0')}`, 'Hardware', p.label, p.quantity, p.quantity * job.units, '', '', '', p.code, '', '', '', '', '', p.notes, ...suffix])];
