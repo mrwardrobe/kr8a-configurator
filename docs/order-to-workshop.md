@@ -79,3 +79,7 @@ The owner release should then freeze an issued CSV/drawing package and supplier 
 ## Verification
 
 49 automated tests pass. New coverage checks exact signed snapshots and quantities, duplicate/concurrent retries, changed-order conflicts, replay/tamper rejection, invalid/unpaid events, storage failures, engineering-hold persistence and production activation gates. Build and TypeScript checks pass. External queue/payment/supplier integration is not represented as tested.
+
+The production build was checked over HTTP: order intake returns 503 while disabled; the owner order API returns 404 with private/no-store and noindex headers. The existing site audit passes for 25 routes and 21 public sitemap entries.
+
+Preview commit `16b03ea` is READY as deployment `dpl_64FyathV55NGwtp4SFf8ahWUhTEW`, with no production target. Browser inspection of the stable branch preview confirms the new incoming-order flow and the explicit “Order storage is not connected. No customer orders are being received.” state. There are no pretend customer orders in the queue. The existing locally saved engineering projects remain separate. Screenshot: `artifacts/order-to-workshop-desktop.png`.

@@ -1,5 +1,7 @@
 # Owner component orders
 
+The primary business workflow is customer order → automatically generated cutting list → owner release → workshop. See [order-to-workshop.md](order-to-workshop.md) for the confirmed-order intake and queue added on 29 October 2026. Manual entry/import below is an engineering fallback and review layer, not the intended day-to-day order-entry process.
+
 The owner workspace is at `/owner/cutting-lists` on the feature preview. Use the stable branch-preview address for consistent browser storage:
 
 https://kr8a-configurator-git-feature-claud-14818b-mrwardrobes-projects.vercel.app/owner/cutting-lists
