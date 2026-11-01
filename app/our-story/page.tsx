@@ -2,11 +2,26 @@ import Link from 'next/link';
 import { EditorialPage, TextSection } from '../../components/SiteChrome';
 import { pageMetadata } from '../../lib/seo';
 
-export const metadata = pageMetadata('Our story', 'Why KR8A is developing sideboards that bring considered furniture design together with made-to-measure dimensions.', '/our-story');
+export const metadata = pageMetadata('Meet the North London furniture maker behind KR8A', 'Discover the personal craftsmanship behind KR8A: more than 20 years of bespoke furniture experience, with every early order assembled, inspected and packaged in North London.', '/our-story');
+
 export default function OurStory() {
-  return <EditorialPage eyebrow="The idea behind KR8A" title="Furniture should fit the way we live." intro="The right piece in the wrong size never feels quite right." crumbs={[{ name: 'Our story', path: '/our-story' }]}>
-    <TextSection title="A simple frustration"><p>A cabinet can be too deep for a hallway, too short for a wall or a few centimetres away from feeling at home. We started KR8A with the ambition to bring the visual discipline of contemporary furniture together with the flexibility of made-to-measure production.</p><p>Instead of reinventing every sideboard, we are developing a considered design that can be adapted within carefully engineered limits. The aim is a clear choice of dimensions, layouts and finishes without a complicated buying process.</p></TextSection>
-    <TextSection title="The details behind the surface"><p>We care about the parts you see and the parts you do not: edges, joints, drawer movement, panel fit and assembly. Those details are still being refined in our first collection.</p><p>KR8A is at the beginning of this story. We will share confirmed materials, product photography, specifications and prices when they are ready.</p></TextSection>
-    <div className="editorial-link-row"><Link href="/materials">Our materials approach ↗</Link><Link href="/#early-access">Follow the launch ↗</Link></div>
+  return <EditorialPage eyebrow="Meet the maker / North London" title="A furniture brand with a craftsman behind it." intro="KR8A is founded on more than 20 years of hands-on experience designing and building bespoke furniture for real homes." crumbs={[{ name: 'Our story', path: '/our-story' }]}>
+    <TextSection title="Why I started KR8A">
+      <p>After years of making fitted furniture, one problem kept coming back: a beautiful cabinet is no use if it is the wrong size for the room. Standard widths and depths leave awkward gaps, crowd walkways and force people to compromise.</p>
+      <p>KR8A began with a simple idea: combine carefully considered contemporary furniture design with dimensions chosen for your space. We are developing sideboards and bedside tables that feel personal without making the buying process complicated.</p>
+    </TextSection>
+    <TextSection title="Personally assembled and checked in North London">
+      <p>KR8A is a small, UK-based furniture venture, not an anonymous mass-production brand. Our plan for the first orders is personal involvement at every stage: reviewing each specification, assembling the furniture, checking the details and packaging it for delivery.</p>
+      <p>Specialist suppliers will precision-cut and edge the engineered panels. Assembly and quality checks will be handled personally in North London. We believe being transparent about who does what is part of good craftsmanship.</p>
+    </TextSection>
+    <TextSection title="See the work, not just the finished furniture">
+      <p>We plan to share real workshop videos showing how panels are joined, how drawers are fitted, how pieces are assembled and how each order is checked. These will feature the actual maker and real KR8A work, rather than stock footage.</p>
+      <p>Our first collection is still being developed, so final specifications and production imagery will be published when verified. You can follow the journey as it happens.</p>
+    </TextSection>
+    <TextSection title="Modern materials. Traditional attention to detail.">
+      <p>We are exploring premium EGGER decorative engineered boards, precision-manufactured components and quality fittings. The aim is furniture that looks beautiful, feels carefully made and fits the way people actually live.</p>
+      <p>For us, made-to-measure is not just a measurement. It is a more personal way to make furniture.</p>
+    </TextSection>
+    <div className="editorial-link-row"><Link href="/sideboards">Explore sideboards ↗</Link><Link href="/bedside-tables">Explore bedside tables ↗</Link><Link href="/#early-access">Follow the launch ↗</Link></div>
   </EditorialPage>;
 }
